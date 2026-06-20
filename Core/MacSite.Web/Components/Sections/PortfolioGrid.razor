@@ -1,0 +1,97 @@
+@rendermode InteractiveServer
+
+<section class="pgrid section">
+    <div class="container">
+        <div class="pgrid__head">
+            <div class="pgrid__heading">
+                <p class="eyebrow">Marie's Visual Portfolio</p>
+                <h2 class="section-heading">Theatrical Designs</h2>
+            </div>
+
+            <div class="pgrid__filter">
+                <button class="filterby @(_open ? "is-open" : "")" @onclick="() => _open = !_open" aria-haspopup="true" aria-expanded="@_open">
+                    @(_filter is null ? "FILTER BY" : _filter.Value.ToDisplay())
+                    <span class="filterby__caret">▾</span>
+                </button>
+                @if (_open)
+                {
+                    <ul class="filtermenu" role="menu">
+                        <li><button class="@(_filter is null ? "is-active" : "")" @onclick="() => Select(null)">ALL</button></li>
+                        @foreach (var cat in Categories)
+                        {
+                            <li><button class="@(_filter == cat ? "is-active" : "")" @onclick="() => Select(cat)">@cat.ToDisplay()</button></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+
+        <div class="pgrid__tabs" role="tablist">
+            @foreach (var cat in Categories)
+            {
+                <button class="pgrid__tab @(_filter == cat ? "is-active" : "")" role="tab"
+                        aria-selected="@(_filter == cat)" @onclick="() => Toggle(cat)">@cat.ToDisplay()</button>
+            }
+        </div>
+
+        <div class="pgrid__grid">
+            @foreach (var p in Visible)
+            {
+                <PortfolioCard Production="p" />
+            }
+        </div>
+
+        @if (Filtered.Count == 0)
+        {
+            <p class="pgrid__empty">No productions in this category yet.</p>
+        }
+
+        @if (Filtered.Count > InitialCount)
+        {
+            <div class="pgrid__foot">
+                <button class="btn btn--solid" @onclick="() => _expanded = !_expanded">
+                    @(_expanded ? "View Less ▲" : "View More ▼")
+                </button>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<Production> Productions { get; set; } = [];
+    [Parameter] public SectionConfig Config { get; set; } = new() { Key = SectionConfig.Grid };
+
+    private ProductionCategory? _filter;
+    private bool _open;
+    private bool _expanded;
+
+    private IReadOnlyList<ProductionCategory> Categories
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Config.EnabledCategoriesCsv)) return EnumDisplay.CategoryOrder;
+            var enabled = Config.EnabledCategoriesCsv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return EnumDisplay.CategoryOrder.Where(c => enabled.Contains(c.ToString(), StringComparer.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    private int InitialCount => Config.GridInitialCount > 0 ? Config.GridInitialCount : 8;
+
+    private IReadOnlyList<Production> Filtered =>
+        (_filter is null ? Productions : Productions.Where(p => p.Category == _filter)).ToList();
+
+    private IEnumerable<Production> Visible => _expanded ? Filtered : Filtered.Take(InitialCount);
+
+    private void Toggle(ProductionCategory cat)
+    {
+        _filter = _filter == cat ? null : cat;
+        _expanded = false;
+    }
+
+    private void Select(ProductionCategory? cat)
+    {
+        _filter = cat;
+        _open = false;
+        _expanded = false;
+    }
+}

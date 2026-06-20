@@ -1,0 +1,16 @@
+@page "/bio"
+@inject SiteContentService Content
+
+<PageTitle>Biography — Marie Anne Chiment</PageTitle>
+
+<PageBanner Title="A Life in Design" Eyebrow="@($"{_settings.BrandName} Biography")" />
+
+<BioSection BrandName="@_settings.BrandName"
+            Body="@_settings.BioBody"
+            PortraitUrl="@_settings.PortraitImageUrl"
+            CvUrl="@_settings.CvFileUrl" />
+
+@code {
+    private SiteSettings _settings = new();
+    protected override async Task OnInitializedAsync() => _settings = await Content.GetSettingsAsync();
+}

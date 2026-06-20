@@ -1,0 +1,16 @@
+@inject IWebHostEnvironment Env
+
+@if (Env.IsDevelopment())
+{
+    <img id="ovl-img" class="ovl__img" src="/_design/home.jpg" alt="" style="opacity:.5;display:none" />
+
+    <div class="ovl-ctl" id="ovl-ctl">
+        <label class="ovl-ctl__chk"><input type="checkbox" id="ovl-show" /> Overlay</label>
+        <input type="range" id="ovl-op" min="0" max="1" step="0.05" value="0.5" title="Opacity" />
+        <button type="button" id="ovl-home">Home</button>
+        <button type="button" id="ovl-port">Portfolio</button>
+        <button type="button" id="ovl-mob">Mobile</button>
+    </div>
+
+    <script src="/js/design-overlay.js" defer></script>
+}

@@ -1,0 +1,138 @@
+@page "/productions"
+@attribute [Authorize]
+@inject IProductionRepository Repo
+
+<PageTitle>Productions — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Productions</h1>
+        <p class="studio__subtitle">The portfolio. Toggle which appear in the homepage Slider vs the Grid.</p>
+    </div>
+    <button class="btn btn--primary" @onclick="() => Edit(new Production { SortOrder = _items.Count, Year = DateTime.UtcNow.Year })">+ Add Production</button>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="panel">
+        <div class="panel__title">@(_isNew ? "New production" : "Edit production")</div>
+        <div class="field-row">
+            <div class="field"><label>Title (show)</label><input class="input" @bind="_editing.Title" /></div>
+            <div class="field"><label>Venue</label><input class="input" @bind="_editing.Venue" /></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Year</label><input class="input" type="number" @bind="_editing.Year" /></div>
+            <div class="field">
+                <label>Category</label>
+                <select class="select" @bind="_editing.Category">
+                    @foreach (var c in EnumDisplay.CategoryOrder)
+                    {
+                        <option value="@c">@c.ToDisplay()</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Director</label><input class="input" @bind="_editing.Director" /></div>
+            <div class="field"><label>Composer / Author</label><input class="input" @bind="_editing.ComposerOrAuthor" /></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Music Director</label><input class="input" @bind="_editing.MusicDirector" /></div>
+            <div class="field"><label>Lighting</label><input class="input" @bind="_editing.Lights" /></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Scenery</label><input class="input" @bind="_editing.Scenery" /></div>
+            <div class="field"><label>Choreography</label><input class="input" @bind="_editing.Choreography" /></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Photographer</label><input class="input" @bind="_editing.Photographer" /></div>
+            <div class="field"><label>Caption scene lines (one per line)</label><textarea class="textarea" @bind="_editing.CaptionScene"></textarea></div>
+        </div>
+        <div class="field"><label>Primary image</label><ImageUploader @bind-Value="_primaryImage" /></div>
+        <div class="field-row">
+            <label class="checkbox"><input type="checkbox" @bind="_editing.ShowInSlider" /> Show in homepage Slider</label>
+            <label class="checkbox"><input type="checkbox" @bind="_editing.ShowInGrid" /> Show in Grid</label>
+        </div>
+        <label class="checkbox"><input type="checkbox" @bind="_editing.IsPublished" /> Published</label>
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
+            <button class="btn btn--ghost" @onclick="() => _editing = null">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="rows">
+    @foreach (var (p, i) in _items.Select((p, i) => (p, i)))
+    {
+        <div class="row">
+            <div class="row__order">
+                <button disabled="@(i == 0)" @onclick="() => MoveAsync(i, -1)">▲</button>
+                <button disabled="@(i == _items.Count - 1)" @onclick="() => MoveAsync(i, 1)">▼</button>
+            </div>
+            <img class="row__thumb" src="@(p.PrimaryImageUrl ?? "/media/portfolio/slider-01.jpg")" alt="" />
+            <div class="row__body">
+                <div class="row__title">@p.Title <span class="hint">@p.Category.ToDisplay()</span></div>
+                <div class="row__meta">@p.Venue · @p.Year</div>
+            </div>
+            <div class="row__actions">
+                @if (p.ShowInSlider) { <span class="badge badge--on">Slider</span> }
+                @if (p.ShowInGrid) { <span class="badge badge--on">Grid</span> }
+                @if (!p.IsPublished) { <span class="badge badge--off">Draft</span> }
+                <button class="btn btn--ghost btn--sm" @onclick="() => Edit(p)">Edit</button>
+                <button class="btn btn--danger btn--sm" @onclick="() => DeleteAsync(p)">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Production> _items = [];
+    private Production? _editing;
+    private string? _primaryImage;
+    private bool _isNew;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync(includeUnpublished: true)).ToList();
+
+    private void Edit(Production p)
+    {
+        _isNew = !_items.Contains(p);
+        _editing = _isNew ? p : Clone(p);
+        _primaryImage = _editing.PrimaryImageUrl;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editing is null) return;
+        if (string.IsNullOrWhiteSpace(_editing.Slug))
+            _editing.Slug = Slug.From($"{_editing.Title}-{_editing.Venue}-{_editing.Year}");
+
+        var id = await Repo.UpsertAsync(_editing);
+        if (!string.IsNullOrWhiteSpace(_primaryImage))
+        {
+            await Repo.ReplaceImagesAsync(id, [new ProductionImage { ProductionId = id, Url = _primaryImage!, IsPrimary = true, SortOrder = 0 }]);
+        }
+        _editing = null;
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(Production p) { await Repo.SoftDeleteAsync(p.Id); await LoadAsync(); }
+
+    private async Task MoveAsync(int index, int delta)
+    {
+        var target = index + delta;
+        if (target < 0 || target >= _items.Count) return;
+        (_items[index], _items[target]) = (_items[target], _items[index]);
+        await Repo.ReorderAsync(_items.Select(x => x.Id).ToList());
+        await LoadAsync();
+    }
+
+    private static Production Clone(Production p) => new()
+    {
+        Id = p.Id, Slug = p.Slug, Title = p.Title, Venue = p.Venue, Year = p.Year,
+        Director = p.Director, ComposerOrAuthor = p.ComposerOrAuthor, MusicDirector = p.MusicDirector,
+        Lights = p.Lights, Scenery = p.Scenery, Choreography = p.Choreography, Photographer = p.Photographer,
+        Category = p.Category, CaptionScene = p.CaptionScene, ShowInSlider = p.ShowInSlider,
+        ShowInGrid = p.ShowInGrid, IsPublished = p.IsPublished, SortOrder = p.SortOrder, Images = p.Images
+    };
+}

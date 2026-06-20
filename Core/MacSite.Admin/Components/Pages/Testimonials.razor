@@ -1,0 +1,112 @@
+@page "/testimonials"
+@attribute [Authorize]
+@inject ITestimonialRepository Repo
+
+<PageTitle>Applause — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Applause / Testimonials</h1>
+        <p class="studio__subtitle">Quotes shown in the "From Stage to Page" carousel.</p>
+    </div>
+    <button class="btn btn--primary" @onclick="() => Edit(new Testimonial { SortOrder = _items.Count })">+ Add Testimonial</button>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="panel">
+        <div class="panel__title">@(_isNew ? "New testimonial" : "Edit testimonial")</div>
+        <div class="field">
+            <label>Quote</label>
+            <textarea class="textarea" @bind="_editing.Quote"></textarea>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Source</label><input class="input" @bind="_editing.Source" placeholder="NEW YORK TIMES" /></div>
+            <div class="field"><label>Image</label><ImageUploader @bind-Value="_editing.ImageUrl" /></div>
+        </div>
+        <label class="checkbox"><input type="checkbox" @bind="_editing.IsActive" /> Active (visible on site)</label>
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
+            <button class="btn btn--ghost" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="rows">
+    @foreach (var (t, i) in _items.Select((t, i) => (t, i)))
+    {
+        <div class="row">
+            <div class="row__order">
+                <button title="Up" disabled="@(i == 0)" @onclick="() => MoveAsync(i, -1)">▲</button>
+                <button title="Down" disabled="@(i == _items.Count - 1)" @onclick="() => MoveAsync(i, 1)">▼</button>
+            </div>
+            <img class="row__thumb" src="@(t.ImageUrl ?? "/media/applause/applause-01.jpg")" alt="" />
+            <div class="row__body">
+                <div class="row__title">@t.Source</div>
+                <div class="row__meta">@Truncate(t.Quote, 90)</div>
+            </div>
+            <div class="row__actions">
+                <span class="badge @(t.IsActive ? "badge--on" : "badge--off")">@(t.IsActive ? "Active" : "Hidden")</span>
+                <button class="btn btn--ghost btn--sm" @onclick="() => ToggleAsync(t)">@(t.IsActive ? "Hide" : "Show")</button>
+                <button class="btn btn--ghost btn--sm" @onclick="() => Edit(t)">Edit</button>
+                <button class="btn btn--danger btn--sm" @onclick="() => DeleteAsync(t)">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Testimonial> _items = [];
+    private Testimonial? _editing;
+    private bool _isNew;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
+
+    private void Edit(Testimonial t)
+    {
+        _isNew = !_items.Contains(t);
+        _editing = _isNew ? t : Clone(t);
+    }
+
+    private void Cancel() => _editing = null;
+
+    private async Task SaveAsync()
+    {
+        if (_editing is null) return;
+        await Repo.UpsertAsync(_editing);
+        _editing = null;
+        await LoadAsync();
+    }
+
+    private async Task ToggleAsync(Testimonial t)
+    {
+        t.IsActive = !t.IsActive;
+        await Repo.UpsertAsync(t);
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(Testimonial t)
+    {
+        await Repo.DeleteAsync(t.Id);
+        await LoadAsync();
+    }
+
+    private async Task MoveAsync(int index, int delta)
+    {
+        var target = index + delta;
+        if (target < 0 || target >= _items.Count) return;
+        (_items[index], _items[target]) = (_items[target], _items[index]);
+        await Repo.ReorderAsync(_items.Select(x => x.Id).ToList());
+        await LoadAsync();
+    }
+
+    private static Testimonial Clone(Testimonial t) => new()
+    {
+        Id = t.Id, Quote = t.Quote, Source = t.Source, ImageUrl = t.ImageUrl,
+        ProductionId = t.ProductionId, SortOrder = t.SortOrder, IsActive = t.IsActive
+    };
+
+    private static string Truncate(string s, int n) => s.Length <= n ? s : s[..n] + "…";
+}

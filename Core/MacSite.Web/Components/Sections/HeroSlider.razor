@@ -1,0 +1,53 @@
+<section class="hero" data-carousel data-cr-mode="fade"
+         data-cr-autoplay="@(Config.Autoplay ? "true" : "false")" data-cr-interval="@Config.IntervalMs">
+    <div class="hero__slides" data-cr-track>
+        @for (var i = 0; i < Slides.Count; i++)
+        {
+            <div class="hero__slide @(i == 0 ? "is-active" : "")"
+                 style="background-image:url('@Slides[i].ImageUrl')"
+                 role="img" aria-label="@Slides[i].Alt"></div>
+        }
+    </div>
+    <div class="hero__scrim"></div>
+
+    <div class="hero__content container">
+        <h1 class="hero__title">@((MarkupString)Headline)</h1>
+        <a class="btn btn--ghost-light hero__cta" href="/portfolio">Enter Portfolio</a>
+    </div>
+
+    @if (Slides.Count > 1 && Config.ShowDots)
+    {
+        <div class="hero__dots" data-cr-dots></div>
+    }
+
+    @* Video medallion — always present; straddles the brush at the hero/slider seam. *@
+    <a class="hero__badge" href="@(string.IsNullOrWhiteSpace(VideoUrl) ? "#" : VideoUrl)"
+       target="@(string.IsNullOrWhiteSpace(VideoUrl) ? null : "_blank")" rel="noopener" aria-label="@VideoBadgeText"
+       style="--badge-img:url('@BadgeUrl')">
+        <svg class="hero__badge-text" viewBox="0 0 200 200" aria-hidden="true">
+            <defs><path id="badgeArc" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" /></defs>
+            <text><textPath href="#badgeArc" startOffset="0">@($"{VideoBadgeText}  •  {VideoBadgeText}  •  ")</textPath></text>
+        </svg>
+        <span class="hero__badge-play"><img src="/icons/play.svg" alt="" width="18" height="32" /></span>
+    </a>
+
+    <div class="hero__brush" aria-hidden="true">
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+            <path d="M0,46 C120,30 210,58 340,52 C470,46 520,20 660,30 C800,40 880,66 1010,58 C1140,50 1230,26 1440,40 L1440,70 L0,70 Z"
+                  fill="var(--c-parchment)" />
+        </svg>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<HeroSlide> Slides { get; set; } = [];
+    [Parameter] public string Headline { get; set; } = string.Empty;
+    [Parameter] public string? VideoUrl { get; set; }
+    [Parameter] public string VideoBadgeText { get; set; } = "THE STAGE COMES ALIVE IN VIDEO";
+    [Parameter] public string? BadgeImageUrl { get; set; }
+    [Parameter] public SectionConfig Config { get; set; } = new() { Key = SectionConfig.Hero };
+
+    private string BadgeUrl => BadgeImageUrl
+        ?? Slides.FirstOrDefault()?.ImageUrl
+        ?? "/media/hero/hero-1.jpg";
+}

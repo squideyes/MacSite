@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/Aspire/">
+    <Project Path="Aspire/MacSite.AppHost/MacSite.AppHost.csproj" />
+    <Project Path="Aspire/MacSite.ServiceDefaults/MacSite.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Core/MacSite.Admin/MacSite.Admin.csproj" />
+    <Project Path="Core/MacSite.Core/MacSite.Core.csproj" />
+    <Project Path="Core/MacSite.Data/MacSite.Data.csproj" />
+    <Project Path="Core/MacSite.Web/MacSite.Web.csproj" />
+  </Folder>
+  <Folder Name="/Docs/">
+    <File Path="Docs/DEPLOY.md" />
+    <File Path="Docs/FIVERR.md" />
+    <File Path="Docs/FONTS.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Root/">
+    <File Path=".dockerignore" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/MacSite.UnitTests/MacSite.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/MacSite.Migrations/MacSite.Migrations.csproj" />
+  </Folder>
+</Solution>

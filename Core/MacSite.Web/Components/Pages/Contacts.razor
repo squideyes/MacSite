@@ -1,0 +1,40 @@
+@page "/contacts"
+@inject SiteContentService Content
+
+<PageTitle>Contact — Marie Anne Chiment</PageTitle>
+
+<PageBanner Title="Contact Marie" Eyebrow="Get in touch"
+            Subtitle="For commissions, availability, and press inquiries." />
+
+<section class="contacts section">
+    <div class="container contacts__layout">
+        <div class="contacts__info">
+            <p class="eyebrow">Studio</p>
+            <h2 class="section-heading">Let's create together</h2>
+            <ul class="contacts__list">
+                <li>
+                    <img src="/icons/call.svg" alt="" width="28" height="28" />
+                    <a href="tel:@_settings.Phone.Replace(" ", "")">@_settings.Phone</a>
+                </li>
+                <li>
+                    <img src="/icons/footer-email.svg" alt="" width="28" height="28" />
+                    <a href="mailto:@_settings.Email">@_settings.Email</a>
+                </li>
+            </ul>
+            <div class="contacts__social">
+                @if (!string.IsNullOrWhiteSpace(_settings.FacebookUrl)) { <a href="@_settings.FacebookUrl" aria-label="Facebook"><img src="/icons/facebook.svg" alt="Facebook" width="11" height="23" /></a> }
+                @if (!string.IsNullOrWhiteSpace(_settings.InstagramUrl)) { <a href="@_settings.InstagramUrl" aria-label="Instagram"><img src="/icons/instagram.svg" alt="Instagram" width="22" height="22" /></a> }
+                @if (!string.IsNullOrWhiteSpace(_settings.YoutubeUrl)) { <a href="@_settings.YoutubeUrl" aria-label="YouTube"><img src="/icons/youtube.svg" alt="YouTube" width="24" height="17" /></a> }
+            </div>
+        </div>
+
+        <div class="contacts__form">
+            <ContactForm />
+        </div>
+    </div>
+</section>
+
+@code {
+    private SiteSettings _settings = new();
+    protected override async Task OnInitializedAsync() => _settings = await Content.GetSettingsAsync();
+}

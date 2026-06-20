@@ -1,0 +1,21 @@
+@page "/applause"
+@inject SiteContentService Content
+@inject ITestimonialRepository TestimonialRepo
+
+<PageTitle>Applause — Marie Anne Chiment</PageTitle>
+
+<PageBanner Title="Applause" Eyebrow="Testimonials &amp; Press"
+            Subtitle="What critics and collaborators say about Marie's work." />
+
+<ApplauseSlider Items="_testimonials" Config="_config" />
+
+@code {
+    private IReadOnlyList<Testimonial> _testimonials = [];
+    private SectionConfig _config = new() { Key = SectionConfig.Applause };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _testimonials = await TestimonialRepo.GetActiveAsync();
+        _config = await Content.GetConfigAsync(SectionConfig.Applause);
+    }
+}

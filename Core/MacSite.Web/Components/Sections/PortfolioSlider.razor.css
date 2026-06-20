@@ -1,0 +1,63 @@
+.pslider {
+    position: relative;
+    background: var(--c-parchment);
+    padding: 22px 0 64px;   /* top clears the medallion that straddles the hero seam */
+}
+
+.pslider__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 34px;
+}
+.pslider__heading .eyebrow { margin-bottom: .45em; }
+
+.pslider__controls { display: flex; align-items: center; gap: 12px; }
+.pslider__arrow {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-brick);
+    background: transparent;
+    color: var(--c-brick);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pslider__arrow:hover { background: var(--c-brick); color: #fff; }
+
+.filterby {
+    display: inline-flex; align-items: center; gap: 24px;
+    font-family: var(--font-ui); font-weight: 700; font-size: 14px;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--c-brick);
+    background: transparent; border: 1.5px solid var(--c-brick);
+    border-radius: var(--radius); padding: 12px 20px;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.filterby:hover { background: var(--c-brick); color: #fff; }
+.filterby__caret { font-size: 11px; }
+
+/* Slide carousel */
+.pslider__viewport {
+    overflow: hidden;
+    padding-inline: max(var(--gutter), calc((100% - var(--content-max)) / 2));
+}
+.pslider__track {
+    display: flex;
+    gap: 24px;
+    transition: transform var(--dur) var(--ease);
+    will-change: transform;
+}
+.pslider__cell {
+    flex: 0 0 auto;
+    width: 384px;
+}
+
+.pslider__foot { display: flex; justify-content: center; margin-top: 44px; }
+
+@media (max-width: 760px) {
+    .pslider { padding-top: 64px; }
+    .pslider__head { flex-direction: column; align-items: stretch; gap: 16px; }
+    .pslider__cell { width: 78vw; }
+}

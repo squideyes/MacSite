@@ -1,0 +1,34 @@
+@page "/login"
+@layout BlankLayout
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+
+<PageTitle>Sign in — MacSite Studio</PageTitle>
+
+<div class="login">
+    <form class="login__card" method="post" action="/auth/login">
+        <div class="login__brand">MARIE ANNE CHIMENT</div>
+        <h1 class="login__title">Studio</h1>
+
+        @if (Error == "1")
+        {
+            <p class="login__error">Invalid email or password.</p>
+        }
+
+        <input type="hidden" name="returnUrl" value="@(ReturnUrl ?? "/")" />
+
+        <label class="login__label">Email
+            <input class="login__input" name="email" type="email" required autofocus autocomplete="username" />
+        </label>
+        <label class="login__label">Password
+            <input class="login__input" name="password" type="password" required autocomplete="current-password" />
+        </label>
+
+        <button class="login__btn" type="submit">Sign In</button>
+    </form>
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string? Error { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+}

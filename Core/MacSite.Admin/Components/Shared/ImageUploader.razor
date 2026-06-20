@@ -1,0 +1,44 @@
+@inject IMediaStorage Storage
+
+<div class="uploader">
+    @if (!string.IsNullOrWhiteSpace(Value))
+    {
+        <img src="@Value" alt="preview" />
+    }
+    <div>
+        <InputFile OnChange="OnChangeAsync" accept="image/*" />
+        @if (_busy)
+        {
+            <div class="hint">Uploading…</div>
+        }
+        else if (!string.IsNullOrWhiteSpace(Value))
+        {
+            <div class="hint">@Value</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    private bool _busy;
+
+    private async Task OnChangeAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is null) return;
+
+        _busy = true;
+        try
+        {
+            await using var stream = file.OpenReadStream(20 * 1024 * 1024);
+            var url = await Storage.SaveAsync(stream, file.Name);
+            await ValueChanged.InvokeAsync(url);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

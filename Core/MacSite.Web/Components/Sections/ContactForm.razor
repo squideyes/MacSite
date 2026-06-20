@@ -1,0 +1,67 @@
+@rendermode InteractiveServer
+@inject IContactMessageRepository Messages
+
+<div class="cform">
+    @if (_done)
+    {
+        <div class="cform__done">
+            <h3>Thank you.</h3>
+            <p>Your message has been received — Marie will be in touch.</p>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="_model" OnValidSubmit="SubmitAsync" FormName="contact">
+            <DataAnnotationsValidator />
+            <div class="cform__row">
+                <label>Name
+                    <InputText @bind-Value="_model.Name" class="cform__input" />
+                    <ValidationMessage For="() => _model.Name" />
+                </label>
+                <label>Email
+                    <InputText @bind-Value="_model.Email" type="email" class="cform__input" />
+                    <ValidationMessage For="() => _model.Email" />
+                </label>
+            </div>
+            <label>Subject
+                <InputText @bind-Value="_model.Subject" class="cform__input" />
+            </label>
+            <label>Message
+                <InputTextArea @bind-Value="_model.Message" rows="6" class="cform__input cform__area" />
+                <ValidationMessage For="() => _model.Message" />
+            </label>
+            <button type="submit" class="btn btn--solid cform__submit">Send Message</button>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private readonly Model _model = new();
+    private bool _done;
+
+    private async Task SubmitAsync()
+    {
+        await Messages.AddAsync(new ContactMessage
+        {
+            Name = _model.Name.Trim(),
+            Email = _model.Email.Trim(),
+            Subject = string.IsNullOrWhiteSpace(_model.Subject) ? null : _model.Subject.Trim(),
+            Message = _model.Message.Trim()
+        });
+        _done = true;
+    }
+
+    private sealed class Model
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Name { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required, System.ComponentModel.DataAnnotations.EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        public string? Subject { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Required, System.ComponentModel.DataAnnotations.MinLength(10)]
+        public string Message { get; set; } = string.Empty;
+    }
+}

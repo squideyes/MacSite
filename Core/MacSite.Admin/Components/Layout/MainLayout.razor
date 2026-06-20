@@ -1,0 +1,47 @@
+@inherits LayoutComponentBase
+@inject IConfiguration Config
+
+<div class="studio">
+    <aside class="studio__side">
+        <div class="studio__brand">MARIE ANNE CHIMENT<small>STUDIO</small></div>
+
+        <nav class="studio__nav">
+            <NavLink href="" Match="NavLinkMatch.All">Dashboard</NavLink>
+            <NavLink href="hero">Hero Slides</NavLink>
+            <NavLink href="productions">Productions</NavLink>
+            <NavLink href="testimonials">Applause</NavLink>
+            <NavLink href="press">Press</NavLink>
+            <NavLink href="downloads">Downloads</NavLink>
+            <hr />
+            <NavLink href="sections">Section Settings</NavLink>
+            <NavLink href="settings">Site Settings</NavLink>
+            <hr />
+            <NavLink href="messages">Messages</NavLink>
+            <NavLink href="subscribers">Subscribers</NavLink>
+        </nav>
+
+        <div class="studio__foot">
+            <AuthorizeView>
+                <Authorized>Signed in as <strong>@context.User.Identity?.Name</strong></Authorized>
+            </AuthorizeView>
+            <div style="margin-top:8px"><a href="@PublicUrl" target="_blank" rel="noopener">View site ↗</a></div>
+            <form method="post" action="/auth/logout">
+                <button class="studio__logout" type="submit">Sign out</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="studio__main">
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private string PublicUrl => Config["PublicSite:Url"] ?? "http://localhost:5242";
+}

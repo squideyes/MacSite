@@ -1,0 +1,54 @@
+# Droplet deployment: migrations (one-shot) -> web + admin.
+# All three share one SQLite database file on the `appdata` volume. There is no database
+# server to run; the migrations container creates/updates the file before web/admin start.
+services:
+  migrations:
+    build:
+      context: .
+      dockerfile: Tools/MacSite.Migrations/Dockerfile
+    image: macsite-migrations:latest
+    environment:
+      ConnectionStrings__macsitedb: "Data Source=/data/macsite.db;Foreign Keys=True"
+      MacSite_ADMIN_EMAIL: ${MacSite_ADMIN_EMAIL:-admin@macsite.com}
+      MacSite_ADMIN_PASSWORD: ${MacSite_ADMIN_PASSWORD:?set MacSite_ADMIN_PASSWORD}
+    volumes:
+      - appdata:/data
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      dockerfile: Core/MacSite.Web/Dockerfile
+    image: macsite-web:latest
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__macsitedb: "Data Source=/data/macsite.db;Foreign Keys=True"
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - appdata:/data
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: .
+      dockerfile: Core/MacSite.Admin/Dockerfile
+    image: macsite-admin:latest
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__macsitedb: "Data Source=/data/macsite.db;Foreign Keys=True"
+      ASPNETCORE_ENVIRONMENT: Production
+      PublicSite__Url: ${PUBLIC_SITE_URL:-https://macsite.com}
+    volumes:
+      - appdata:/data
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+
+volumes:
+  appdata:

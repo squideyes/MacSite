@@ -1,0 +1,40 @@
+@page "/subscribers"
+@attribute [Authorize]
+@inject ISubscriberRepository Repo
+
+<PageTitle>Subscribers — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Subscribers</h1>
+        <p class="studio__subtitle">@_items.Count newsletter sign-ups.</p>
+    </div>
+    <a class="btn btn--ghost" href="data:text/csv;charset=utf-8,@Uri.EscapeDataString(_csv)" download="subscribers.csv">Export CSV</a>
+</div>
+
+<div class="rows">
+    @if (_items.Count == 0)
+    {
+        <div class="panel">No subscribers yet.</div>
+    }
+    @foreach (var s in _items)
+    {
+        <div class="row">
+            <div class="row__body">
+                <div class="row__title">@s.Email</div>
+                <div class="row__meta">@s.CreatedAt.LocalDateTime.ToString("g")</div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Subscriber> _items = [];
+    private string _csv = "email,created_at\n";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = (await Repo.GetAllAsync()).ToList();
+        _csv = "email,created_at\n" + string.Join("\n", _items.Select(s => $"{s.Email},{s.CreatedAt:O}"));
+    }
+}

@@ -1,0 +1,21 @@
+@page "/downloads"
+@inject SiteContentService Content
+@inject IDownloadRepository DownloadRepo
+
+<PageTitle>Downloads — Marie Anne Chiment</PageTitle>
+
+<PageBanner Title="Downloads" Eyebrow="Media &amp; Press Kit"
+            Subtitle="Publicity-ready images, renderings, and Marie's CV." />
+
+<DownloadsSection Resource="_publicity" NewsletterHeading="@_settings.NewsletterHeading" />
+
+@code {
+    private SiteSettings _settings = new();
+    private MediaDownload? _publicity;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _settings = await Content.GetSettingsAsync();
+        _publicity = (await DownloadRepo.GetActiveAsync(DownloadKind.PublicityResource)).FirstOrDefault();
+    }
+}

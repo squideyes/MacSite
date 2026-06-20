@@ -1,0 +1,175 @@
+/* ============================================================================
+   MacSite.com — global base & layout. Component-specific styles live in
+   each component's .razor.css. Everything references design-tokens.css.
+   ============================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+    background-color: var(--c-parchment);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    margin: 0;
+}
+
+p { margin: 0 0 1em; }
+
+/* ── Layout primitives ──────────────────────────────────────────────────────
+   .page caps the whole site at the 1920 design width and centres it, so the
+   desktop comp renders 1:1. Full-bleed sections span the page; .container holds
+   the inner content column. */
+.page {
+    width: 100%;
+    max-width: var(--design-width);
+    margin-inline: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    width: 100%;
+    /* content column is var(--content-max) wide; gutters sit outside it, so the
+       content edge lands at the measured ~226px margin on a 1920 canvas. */
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+}
+
+.section { position: relative; }
+
+/* ── Shared text styles ─────────────────────────────────────────────────── */
+.eyebrow {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--c-brick);
+    margin: 0 0 .35em;
+}
+
+.section-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-heading);
+    letter-spacing: .01em;
+    color: var(--c-ink);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6em;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: var(--fs-button);
+    letter-spacing: var(--ls-caps);
+    text-transform: uppercase;
+    padding: 1.1em 2.1em;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.btn--solid {
+    background: var(--c-brick);
+    color: var(--c-white);
+    box-shadow: inset 0 0 0 4px rgba(255,255,255,.0), 0 2px 0 rgba(0,0,0,.15);
+}
+.btn--solid:hover { background: var(--c-brick-deep); }
+
+.btn--outline {
+    background: transparent;
+    color: var(--c-brick);
+    border-color: var(--c-brick);
+}
+.btn--outline:hover { background: var(--c-brick); color: var(--c-white); }
+
+.btn--ghost-light {
+    background: transparent;
+    color: var(--c-white);
+    border-color: rgba(255,255,255,.85);
+}
+.btn--ghost-light:hover { background: rgba(255,255,255,.12); }
+
+/* ── Utilities ──────────────────────────────────────────────────────────── */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+}
+
+/* ── Form controls ──────────────────────────────────────────────────────────
+   Declared globally because Blazor CSS isolation does NOT scope the elements
+   rendered by child input components (InputText/InputTextArea). */
+.cform__input, .cform__area {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--c-ink);
+    background: var(--c-white);
+    border: 1px solid var(--c-frame);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color var(--dur) var(--ease);
+}
+.cform__input:focus, .cform__area:focus { border-color: var(--c-brick); }
+.cform__area { resize: vertical; min-height: 150px; }
+
+.signup__input {
+    flex: 1;
+    box-sizing: border-box;
+    border: 0;
+    background: transparent;
+    color: var(--c-white);
+    font-family: var(--font-body);
+    font-size: 17px;
+    padding: 18px 6px;
+    outline: none;
+}
+.signup__input::placeholder { color: rgba(255, 255, 255, 0.72); }
+
+/* Blazor error UI hidden until triggered by the framework. */
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    inset: auto 0 0 0;
+    background: #2b1a14;
+    color: #fff;
+    padding: .8rem 1.2rem;
+    z-index: 1000;
+    text-align: center;
+}
+#blazor-error-ui .reload { color: #ffd9c9; text-decoration: underline; }
+#blazor-error-ui .dismiss { cursor: pointer; float: right; }

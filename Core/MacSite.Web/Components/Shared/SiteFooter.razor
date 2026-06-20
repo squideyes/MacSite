@@ -1,0 +1,75 @@
+@inject SiteContentService Content
+
+<footer class="ft">
+    <div class="ft__cols container">
+        <div class="ft__brand">
+            <span>@_logoLine1</span>
+            <span>@_logoLine2</span>
+        </div>
+
+        <div class="ft__contact">
+            <a class="ft__row" href="tel:@_settings.Phone.Replace(" ", "")">
+                <img src="/icons/call.svg" alt="" width="34" height="34" />
+                <span><strong>CALL US</strong>&nbsp;&nbsp;@_settings.Phone</span>
+            </a>
+            <a class="ft__row" href="mailto:@_settings.Email">
+                <img src="/icons/footer-email.svg" alt="" width="34" height="34" />
+                <span><strong>EMAIL:</strong>&nbsp;&nbsp;@_settings.Email</span>
+            </a>
+        </div>
+
+        <div class="ft__social">
+            <h4 class="ft__social-title">FOLLOW US ON SOCIAL</h4>
+            <div class="ft__icons">
+                @if (!string.IsNullOrWhiteSpace(_settings.FacebookUrl))
+                {
+                    <a href="@_settings.FacebookUrl" aria-label="Facebook" class="ft__icon"><img src="/icons/facebook.svg" alt="Facebook" width="11" height="23" /></a>
+                }
+                @if (!string.IsNullOrWhiteSpace(_settings.InstagramUrl))
+                {
+                    <a href="@_settings.InstagramUrl" aria-label="Instagram" class="ft__icon"><img src="/icons/instagram.svg" alt="Instagram" width="22" height="22" /></a>
+                }
+                @if (!string.IsNullOrWhiteSpace(_settings.YoutubeUrl))
+                {
+                    <a href="@_settings.YoutubeUrl" aria-label="YouTube" class="ft__icon"><img src="/icons/youtube.svg" alt="YouTube" width="24" height="17" /></a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <nav class="ft__nav container" aria-label="Footer">
+        @for (var i = 0; i < NavItems.Length; i++)
+        {
+            if (i > 0)
+            {
+                <span class="ft__star">&#9733;</span>
+            }
+            <a href="@NavItems[i].Href">@NavItems[i].Label</a>
+        }
+    </nav>
+
+    <p class="ft__copy">&copy;@DateTime.Now.Year&nbsp; <strong>@_settings.CopyrightName</strong>, all rights reserved</p>
+</footer>
+
+@code {
+    private SiteSettings _settings = new();
+    private string _logoLine1 = "MARIE ANNE";
+    private string _logoLine2 = "CHIMENT";
+
+    private static readonly (string Label, string Href)[] NavItems =
+    [
+        ("HOME", "/"), ("PORTFOLIO", "/portfolio"), ("APPLAUSE", "/applause"),
+        ("BIO", "/bio"), ("DOWNLOADS", "/downloads"), ("CONTACTS", "/contacts"),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _settings = await Content.GetSettingsAsync();
+        var words = _settings.BrandName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (words.Length >= 3)
+        {
+            _logoLine1 = string.Join(' ', words[..^1]);
+            _logoLine2 = words[^1];
+        }
+    }
+}

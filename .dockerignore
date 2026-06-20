@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+_analysis/
+Design/
+.git/
+.github/
+**/*.user
+**/appsettings.Development.json
+README*.md
+DEPLOY.md
+docs/

@@ -1,0 +1,60 @@
+@inject SiteContentService Content
+
+<header class="hdr @(Solid ? "hdr--solid" : "")">
+    <input type="checkbox" id="nav-toggle" class="hdr__toggle" aria-hidden="true" />
+    <div class="hdr__bar container">
+        <a class="hdr__logo" href="/">
+            <span>@_logoLine1</span>
+            <span>@_logoLine2</span>
+        </a>
+
+        <nav class="hdr__nav" aria-label="Primary">
+            @foreach (var item in NavItems)
+            {
+                <NavLink class="hdr__link" href="@item.Href" Match="@(item.Href == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)">@item.Label</NavLink>
+            }
+        </nav>
+
+        <a class="hdr__cta btn btn--ghost-light" href="/contacts">Contact Marie</a>
+
+        <label for="nav-toggle" class="hdr__burger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </label>
+    </div>
+
+    <label for="nav-toggle" class="hdr__scrim" aria-hidden="true"></label>
+</header>
+
+@code {
+    /// <summary>When true the header uses dark text on a light background (non-hero pages).</summary>
+    [Parameter] public bool Solid { get; set; }
+
+    private string _logoLine1 = "MARIE ANNE";
+    private string _logoLine2 = "CHIMENT";
+
+    private static readonly (string Label, string Href)[] NavItems =
+    [
+        ("HOME", "/"),
+        ("PORTFOLIO", "/portfolio"),
+        ("APPLAUSE", "/applause"),
+        ("BIO", "/bio"),
+        ("DOWNLOADS", "/downloads"),
+        ("CONTACTS", "/contacts"),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await Content.GetSettingsAsync();
+        var words = settings.BrandName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (words.Length >= 3)
+        {
+            _logoLine1 = string.Join(' ', words[..^1]);
+            _logoLine2 = words[^1];
+        }
+        else if (words.Length > 0)
+        {
+            _logoLine1 = settings.BrandName;
+            _logoLine2 = string.Empty;
+        }
+    }
+}

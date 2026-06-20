@@ -1,0 +1,83 @@
+/* ============================================================================
+   MacSite.com — Design Tokens
+   Single source of truth for the visual system. Values are measured against the
+   1920px-wide design comp (PSD). All components consume these tokens only.
+   ============================================================================ */
+:root {
+    /* ── Palette (sampled from the PSD; refine against per-layer values) ─────── */
+    --c-parchment:      #FEFBF2;  /* page background (cream) */
+    --c-parchment-2:    #F6F0E2;  /* subtle alt background */
+    --c-card-cream:     #EDE6D6;  /* filter tabs / inactive chips */
+    --c-frame:          #D9CDB4;  /* portfolio card frame border */
+    --c-ink:            #1A120F;  /* primary near-black warm text */
+    --c-ink-soft:       #3E2F27;  /* secondary text */
+    --c-brick:          #8A2B17;  /* primary accent (buttons, eyebrows) */
+    --c-brick-bright:   #902511;  /* announcement bar mid */
+    --c-brick-deep:     #6D1D05;  /* footer / gradient ends */
+    --c-white:          #FFFFFF;
+    --c-hero-overlay:   rgba(10, 6, 4, 0.45);
+
+    --grad-brick: linear-gradient(180deg, #7A2009 0%, #902511 50%, #6C1C05 100%);
+    --grad-brick-h: linear-gradient(90deg, #6C1C05 0%, #902511 50%, #6C1C05 100%);
+
+    /* ── Font families (the swap-later seam) ────────────────────────────────── */
+    --font-display: 'Matita Informal', 'Arial Black', system-ui, sans-serif; /* headlines (exact) */
+    --font-ui:      'Inter', system-ui, 'Segoe UI', sans-serif;              /* Aeonik substitute */
+    --font-body:    'Source Sans 3', system-ui, 'Segoe UI', sans-serif;      /* Myriad substitute */
+
+    /* ── Type scale (px @1920 comp, from PSD /FontSize values) ──────────────── */
+    --fs-hero:        96px;   /* hero headline */
+    --fs-heading:     90px;   /* section heading (Matita; measured cap-height ~64px) */
+    --fs-heading-sm:  54px;
+    --fs-watermark:  221px;   /* rotated BIOGRAPHY / APPLAUSE */
+    --fs-eyebrow:     22px;   /* red section eyebrow */
+    --fs-nav:         16px;
+    --fs-button:      15px;
+    --fs-body:        20px;   /* measured line-spacing ~32px */
+    --fs-body-sm:     16px;
+    --fs-card-title:  20px;
+    --fs-caption:     18px;
+    --fs-announce:    15px;
+    --fs-footer:      18px;
+
+    --lh-tight: 1.04;
+    --lh-snug:  1.2;
+    --lh-body:  1.7;
+
+    --ls-eyebrow: 0.16em;  /* letter spacing for eyebrows / nav / captions */
+    --ls-nav:     0.08em;
+    --ls-caps:    0.12em;
+
+    /* ── Layout ─────────────────────────────────────────────────────────────── */
+    --design-width: 1920px;
+    --content-max:  1468px;  /* inner content column (measured: ~226px margins @1920) */
+    --gutter:       40px;    /* page horizontal padding (desktop) */
+    --gutter-mobile: 24px;
+
+    --radius:    4px;
+    --radius-pill: 28px;
+
+    --shadow-card: 0 18px 40px rgba(26, 18, 15, 0.18);
+    --shadow-soft: 0 10px 30px rgba(26, 18, 15, 0.12);
+
+    /* ── Motion ─────────────────────────────────────────────────────────────── */
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --dur:  420ms;
+
+    /* Header height (announcement + nav) used to offset anchored scrolls. */
+    --header-h: 92px;
+    --announce-h: 36px;
+}
+
+/* Mobile token overrides (reproduce the mobile comp). */
+@media (max-width: 760px) {
+    :root {
+        --fs-hero:      40px;
+        --fs-heading:   46px;
+        --fs-heading-sm: 34px;
+        --fs-watermark: 120px;
+        --fs-eyebrow:   18px;
+        --fs-body:      17px;
+        --gutter:       var(--gutter-mobile);
+    }
+}

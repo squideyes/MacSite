@@ -1,0 +1,82 @@
+@page "/downloads"
+@attribute [Authorize]
+@inject IDownloadRepository Repo
+
+<PageTitle>Downloads — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Downloads</h1>
+        <p class="studio__subtitle">Publicity resources, CV, and other downloadable media.</p>
+    </div>
+    <button class="btn btn--primary" @onclick="() => Edit(new MediaDownload { SortOrder = _items.Count, IsActive = true })">+ Add Download</button>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="panel">
+        <div class="panel__title">@(_isNew ? "New download" : "Edit download")</div>
+        <div class="field-row">
+            <div class="field">
+                <label>Kind</label>
+                <select class="select" @bind="_editing.Kind">
+                    @foreach (var k in Enum.GetValues<DownloadKind>())
+                    {
+                        <option value="@k">@k</option>
+                    }
+                </select>
+            </div>
+            <div class="field"><label>Title</label><input class="input" @bind="_editing.Title" /></div>
+        </div>
+        <div class="field"><label>Description</label><textarea class="textarea" @bind="_editing.Description"></textarea></div>
+        <div class="field"><label>File URL</label><input class="input" @bind="_editing.FileUrl" /></div>
+        <div class="field"><label>Thumbnail URLs (one per line)</label><textarea class="textarea" @bind="_editing.ThumbnailUrls"></textarea></div>
+        <label class="checkbox"><input type="checkbox" @bind="_editing.IsActive" /> Active</label>
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
+            <button class="btn btn--ghost" @onclick="() => _editing = null">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="rows">
+    @foreach (var d in _items)
+    {
+        <div class="row">
+            <div class="row__body">
+                <div class="row__title">@d.Title <span class="hint">(@d.Kind)</span></div>
+                <div class="row__meta">@d.FileUrl</div>
+            </div>
+            <div class="row__actions">
+                <span class="badge @(d.IsActive ? "badge--on" : "badge--off")">@(d.IsActive ? "Active" : "Hidden")</span>
+                <button class="btn btn--ghost btn--sm" @onclick="() => Edit(d)">Edit</button>
+                <button class="btn btn--danger btn--sm" @onclick="() => DeleteAsync(d)">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<MediaDownload> _items = [];
+    private MediaDownload? _editing;
+    private bool _isNew;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
+
+    private void Edit(MediaDownload d)
+    {
+        _isNew = !_items.Contains(d);
+        _editing = _isNew ? d : new MediaDownload { Id = d.Id, Kind = d.Kind, Title = d.Title, Description = d.Description, FileUrl = d.FileUrl, ThumbnailUrls = d.ThumbnailUrls, SortOrder = d.SortOrder, IsActive = d.IsActive };
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editing is null) return;
+        await Repo.UpsertAsync(_editing);
+        _editing = null;
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(MediaDownload d) { await Repo.DeleteAsync(d.Id); await LoadAsync(); }
+}

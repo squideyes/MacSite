@@ -1,0 +1,36 @@
+<section class="applause section" data-carousel data-cr-mode="slide"
+         data-cr-autoplay="@(Config.Autoplay ? "true" : "false")" data-cr-interval="@Config.IntervalMs">
+    <span class="applause__watermark" aria-hidden="true">APPLAUSE</span>
+
+    <div class="container applause__head">
+        <p class="eyebrow">Applause / Testimonials</p>
+        <h2 class="section-heading">From Stage to Page</h2>
+    </div>
+
+    <div class="applause__viewport">
+        <div class="applause__track" data-cr-track>
+            @foreach (var t in Items)
+            {
+                <figure class="applause__cell">
+                    <div class="applause__card">
+                        <img src="@(t.ImageUrl ?? "/media/applause/applause-01.jpg")" alt="@t.Source" loading="lazy" />
+                        <figcaption class="applause__caption">
+                            <p class="applause__quote">&ldquo;@t.Quote&rdquo;</p>
+                            <span class="applause__source">@t.Source</span>
+                        </figcaption>
+                    </div>
+                </figure>
+            }
+        </div>
+    </div>
+
+    @if (Items.Count > 1 && Config.ShowDots)
+    {
+        <div class="applause__dots" data-cr-dots></div>
+    }
+</section>
+
+@code {
+    [Parameter] public IReadOnlyList<Testimonial> Items { get; set; } = [];
+    [Parameter] public SectionConfig Config { get; set; } = new() { Key = SectionConfig.Applause };
+}

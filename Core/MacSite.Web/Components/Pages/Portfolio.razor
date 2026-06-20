@@ -1,0 +1,55 @@
+@page "/portfolio"
+@inject SiteContentService Content
+@inject IHeroSlideRepository HeroRepo
+@inject IProductionRepository ProductionRepo
+@inject IPressRepository PressRepo
+@inject ITestimonialRepository TestimonialRepo
+@inject IDownloadRepository DownloadRepo
+
+<PageTitle>Portfolio — Marie Anne Chiment</PageTitle>
+
+<HeroSlider Slides="_heroSlides"
+            Headline="@_settings.DefaultHeroHeadline"
+            VideoUrl="@_settings.HeroVideoUrl"
+            VideoBadgeText="@_settings.HeroVideoBadgeText"
+            Config="_heroConfig" />
+
+<PortfolioGrid Productions="_gridProductions" Config="_gridConfig" />
+
+<BioSection BrandName="@_settings.BrandName"
+            Body="@_settings.BioBody"
+            PortraitUrl="@_settings.PortraitImageUrl"
+            CvUrl="@_settings.CvFileUrl" />
+
+<SpotlightSection Items="_press" />
+
+<ApplauseSlider Items="_testimonials" Config="_applauseConfig" />
+
+<DownloadsSection Resource="_publicity" NewsletterHeading="@_settings.NewsletterHeading" />
+
+@code {
+    private SiteSettings _settings = new();
+    private IReadOnlyList<HeroSlide> _heroSlides = [];
+    private IReadOnlyList<Production> _gridProductions = [];
+    private IReadOnlyList<PressItem> _press = [];
+    private IReadOnlyList<Testimonial> _testimonials = [];
+    private MediaDownload? _publicity;
+
+    private SectionConfig _heroConfig = new() { Key = SectionConfig.Hero };
+    private SectionConfig _gridConfig = new() { Key = SectionConfig.Grid };
+    private SectionConfig _applauseConfig = new() { Key = SectionConfig.Applause };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _settings = await Content.GetSettingsAsync();
+        _heroSlides = await HeroRepo.GetActiveAsync();
+        _gridProductions = await ProductionRepo.GetForGridAsync();
+        _press = await PressRepo.GetActiveAsync();
+        _testimonials = await TestimonialRepo.GetActiveAsync();
+        _publicity = (await DownloadRepo.GetActiveAsync(DownloadKind.PublicityResource)).FirstOrDefault();
+
+        _heroConfig = await Content.GetConfigAsync(SectionConfig.Hero);
+        _gridConfig = await Content.GetConfigAsync(SectionConfig.Grid);
+        _applauseConfig = await Content.GetConfigAsync(SectionConfig.Applause);
+    }
+}

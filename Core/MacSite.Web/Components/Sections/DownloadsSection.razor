@@ -1,0 +1,33 @@
+<section class="downloads section">
+    <div class="downloads__ghost" aria-hidden="true"></div>
+    <div class="downloads__panel">
+        <div class="downloads__sheet">
+            <header class="downloads__head">
+                <p class="eyebrow">Media Downloads</p>
+                <h2 class="section-heading">Publicity Resources</h2>
+            </header>
+
+            @if (Resource is not null)
+            {
+                <div class="downloads__photos">
+                    @foreach (var thumb in Resource.Thumbnails.Take(2))
+                    {
+                        <figure class="downloads__photo taped"><img src="@thumb" alt="Publicity image" loading="lazy" /></figure>
+                    }
+                </div>
+
+                <a class="btn btn--solid downloads__btn" href="@Resource.FileUrl" download>
+                    Download <img src="/icons/download.svg" alt="" width="16" height="18" />
+                </a>
+            }
+
+            <h3 class="downloads__bts">@NewsletterHeading</h3>
+            <NewsletterSignup />
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public MediaDownload? Resource { get; set; }
+    [Parameter] public string NewsletterHeading { get; set; } = "BEHIND THE SCENES WITH MARIE ANNE CHIMENT";
+}

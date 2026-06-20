@@ -1,0 +1,72 @@
+@page "/settings"
+@attribute [Authorize]
+@inject ISiteSettingsRepository Repo
+
+<PageTitle>Site Settings — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Site Settings</h1>
+        <p class="studio__subtitle">Brand, announcement bar, hero, bio, contact, and social links.</p>
+    </div>
+    <div>
+        <button class="btn btn--primary" @onclick="SaveAsync">Save changes</button>
+        @if (_saved) { <span class="saved" style="margin-left:10px">Saved ✓</span> }
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Brand &amp; announcement</div>
+    <div class="field"><label>Brand name</label><input class="input" @bind="_s.BrandName" /></div>
+    <div class="field"><label>Announcement bar (allows &lt;u&gt;)</label><input class="input" @bind="_s.AnnouncementText" /></div>
+    <div class="field"><label>Copyright name</label><input class="input" @bind="_s.CopyrightName" /></div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Hero</div>
+    <div class="field"><label>Default headline (allows &lt;br&gt;)</label><textarea class="textarea" @bind="_s.DefaultHeroHeadline"></textarea></div>
+    <div class="field-row">
+        <div class="field"><label>Video URL</label><input class="input" @bind="_s.HeroVideoUrl" /></div>
+        <div class="field"><label>Video badge text</label><input class="input" @bind="_s.HeroVideoBadgeText" /></div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Biography</div>
+    <div class="field"><label>Bio body</label><textarea class="textarea" style="min-height:160px" @bind="_s.BioBody"></textarea></div>
+    <div class="field-row">
+        <div class="field"><label>Portrait image</label><ImageUploader @bind-Value="_s.PortraitImageUrl" /></div>
+        <div class="field"><label>CV file URL</label><input class="input" @bind="_s.CvFileUrl" /></div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Newsletter &amp; contact</div>
+    <div class="field"><label>Newsletter heading</label><input class="input" @bind="_s.NewsletterHeading" /></div>
+    <div class="field-row">
+        <div class="field"><label>Phone</label><input class="input" @bind="_s.Phone" /></div>
+        <div class="field"><label>Email</label><input class="input" @bind="_s.Email" /></div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Social</div>
+    <div class="field-row">
+        <div class="field"><label>Facebook URL</label><input class="input" @bind="_s.FacebookUrl" /></div>
+        <div class="field"><label>Instagram URL</label><input class="input" @bind="_s.InstagramUrl" /></div>
+    </div>
+    <div class="field"><label>YouTube URL</label><input class="input" @bind="_s.YoutubeUrl" /></div>
+</div>
+
+@code {
+    private SiteSettings _s = new();
+    private bool _saved;
+
+    protected override async Task OnInitializedAsync() => _s = await Repo.GetAsync();
+
+    private async Task SaveAsync()
+    {
+        await Repo.UpdateAsync(_s);
+        _saved = true;
+    }
+}

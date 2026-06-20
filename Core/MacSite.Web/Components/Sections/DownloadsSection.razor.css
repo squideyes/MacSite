@@ -1,0 +1,86 @@
+.downloads {
+    position: relative;
+    background: var(--c-parchment);
+    padding: 70px 0 80px;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Ghosted couple bleeding in from the lower-left (extracted from the comp) */
+.downloads__ghost {
+    position: absolute;
+    left: 0;
+    bottom: 40px;
+    width: 300px;
+    height: 320px;
+    background: url('/media/decor/ghost-couple.png') left bottom / contain no-repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Stacked aged-paper panel (approximation; swap in PSD paper texture later) */
+.downloads__panel {
+    position: relative;
+    width: min(1240px, 94vw);
+}
+.downloads__panel::before,
+.downloads__panel::after {
+    content: "";
+    position: absolute;
+    inset: 10px -18px -18px;
+    background: #cdbfa3;
+    box-shadow: var(--shadow-card);
+    z-index: 0;
+}
+.downloads__panel::before { transform: rotate(-1.2deg); inset: -10px -10px 18px; background: #d8cbb0; }
+.downloads__panel::after  { transform: rotate(1.4deg); }
+
+.downloads__sheet {
+    position: relative;
+    z-index: 2;
+    background: url('/media/decor/paper-tex.png') top left repeat, linear-gradient(160deg, #efe7d4 0%, #e4d8bf 100%);
+    background-size: 280px auto, auto;
+    padding: 70px 80px 64px;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+}
+
+.downloads__head { margin-bottom: 30px; }
+.downloads__head .eyebrow { color: var(--c-brick); }
+
+.downloads__photos {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 44px;
+    min-height: 230px;
+}
+.downloads__photo {
+    background: #fff;
+    padding: 8px;
+    box-shadow: var(--shadow-card);
+    margin: 0;
+}
+.downloads__photo img { width: 190px; height: 210px; object-fit: cover; display: block; }
+.downloads__photo:first-child { transform: rotate(-4deg); }
+.downloads__photo:last-child { transform: rotate(4deg); margin-left: -26px; margin-top: 16px; }
+
+.downloads__btn { gap: .8em; }
+.downloads__btn img { filter: brightness(0) invert(1); }
+
+.downloads__bts {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 36px;
+    text-transform: uppercase;
+    color: var(--c-ink);
+    margin: 60px 0 26px;
+    line-height: 1.1;
+}
+
+@media (max-width: 760px) {
+    .downloads__sheet { padding: 48px 28px 44px; }
+    .downloads__bts { font-size: 26px; }
+}

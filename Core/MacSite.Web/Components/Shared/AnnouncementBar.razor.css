@@ -1,0 +1,29 @@
+.announce {
+    position: relative;
+    z-index: 30;
+    height: var(--announce-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--grad-brick-h);
+    padding-inline: var(--gutter);
+}
+
+.announce__inner {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: var(--fs-announce);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--c-white);
+    text-align: center;
+    line-height: 1;
+}
+
+/* Underlined emphasis words come from the editable announcement markup. */
+::deep u { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+@media (max-width: 760px) {
+    .announce { height: auto; padding-block: 7px; padding-inline: 16px; }
+    .announce__inner { font-size: 10px; letter-spacing: .02em; line-height: 1.3; }
+}

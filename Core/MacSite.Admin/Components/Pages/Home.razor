@@ -1,0 +1,49 @@
+@page "/"
+@attribute [Authorize]
+@inject IProductionRepository Productions
+@inject ITestimonialRepository Testimonials
+@inject IPressRepository Press
+@inject IHeroSlideRepository Hero
+@inject ISubscriberRepository Subscribers
+@inject IContactMessageRepository Messages
+
+<PageTitle>Dashboard — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Dashboard</h1>
+        <p class="studio__subtitle">Manage Marie's portfolio content — changes appear on the public site immediately.</p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <div class="stat"><div class="stat__num">@_productions</div><div class="stat__label">Productions</div></div>
+    <div class="stat"><div class="stat__num">@_hero</div><div class="stat__label">Hero Slides</div></div>
+    <div class="stat"><div class="stat__num">@_testimonials</div><div class="stat__label">Testimonials</div></div>
+    <div class="stat"><div class="stat__num">@_press</div><div class="stat__label">Press</div></div>
+    <div class="stat"><div class="stat__num">@_subscribers</div><div class="stat__label">Subscribers</div></div>
+    <div class="stat"><div class="stat__num">@_messages</div><div class="stat__label">Messages</div></div>
+</div>
+
+<div class="panel">
+    <div class="panel__title">Configurable sections</div>
+    <div class="rows">
+        <div class="row"><div class="row__body"><div class="row__title">Applause / Testimonials</div><div class="row__meta">Edit quotes, sources, images, order, autoplay.</div></div><a class="btn btn--ghost btn--sm" href="testimonials">Edit</a></div>
+        <div class="row"><div class="row__body"><div class="row__title">Portfolio Slider &amp; Grid</div><div class="row__meta">Manage productions and which appear where.</div></div><a class="btn btn--ghost btn--sm" href="productions">Edit</a></div>
+        <div class="row"><div class="row__body"><div class="row__title">Section behaviour</div><div class="row__meta">Autoplay, intervals, visible counts, filter categories.</div></div><a class="btn btn--ghost btn--sm" href="sections">Edit</a></div>
+    </div>
+</div>
+
+@code {
+    private int _productions, _hero, _testimonials, _press, _subscribers, _messages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _productions = (await Productions.GetAllAsync(includeUnpublished: true)).Count;
+        _hero = (await Hero.GetAllAsync()).Count;
+        _testimonials = (await Testimonials.GetAllAsync()).Count;
+        _press = (await Press.GetAllAsync()).Count;
+        _subscribers = (await Subscribers.GetAllAsync()).Count;
+        _messages = (await Messages.GetAllAsync()).Count;
+    }
+}

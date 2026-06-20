@@ -1,0 +1,40 @@
+/* ── Brand display font: Matita Informal (self-hosted, provided with the design) ──
+   This is the signature headline face and is the ONE exact font we have.
+   OTF now; convert to woff2 in the polish phase. */
+@font-face {
+    font-family: 'Matita Informal';
+    src: url('/fonts/MatitaInformal-Light.otf') format('opentype');
+    font-weight: 300;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Matita Informal';
+    src: url('/fonts/MatitaInformal-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Matita Informal';
+    src: url('/fonts/MatitaInformal-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Matita Informal';
+    src: url('/fonts/MatitaInformal-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Matita Informal';
+    src: url('/fonts/MatitaInformal-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-display: swap;
+}
+
+/*
+   Aeonik (logo/nav/buttons) and Myriad Pro (body) are commercial and were NOT delivered.
+   We substitute Inter (for Aeonik) and Source Sans 3 (for Myriad), loaded via Google Fonts
+   in App.razor for now. They are referenced ONLY through the --font-ui / --font-body tokens
+   so swapping in licensed Aeonik later is a one-place change. See docs/FONTS.md.
+*/

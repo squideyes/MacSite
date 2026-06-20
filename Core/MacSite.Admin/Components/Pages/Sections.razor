@@ -1,0 +1,59 @@
+@page "/sections"
+@attribute [Authorize]
+@inject ISectionConfigRepository Repo
+
+<PageTitle>Section Settings — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Section Settings</h1>
+        <p class="studio__subtitle">Behaviour knobs for the Hero, Slider, Applause, and Grid sections.</p>
+    </div>
+</div>
+
+@foreach (var cfg in _configs)
+{
+    <div class="panel">
+        <div class="panel__title">@cfg.DisplayName <span class="hint">(@cfg.Key)</span></div>
+        <div class="field-row">
+            <label class="checkbox"><input type="checkbox" @bind="cfg.Autoplay" /> Autoplay</label>
+            <div class="field"><label>Interval (ms)</label><input class="input" type="number" @bind="cfg.IntervalMs" /></div>
+        </div>
+        <div class="field-row">
+            <label class="checkbox"><input type="checkbox" @bind="cfg.ShowDots" /> Show dots</label>
+            <label class="checkbox"><input type="checkbox" @bind="cfg.ShowCaptions" /> Show captions</label>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Visible (desktop)</label><input class="input" type="number" @bind="cfg.SlidesVisibleDesktop" /></div>
+            <div class="field"><label>Visible (mobile)</label><input class="input" type="number" @bind="cfg.SlidesVisibleMobile" /></div>
+        </div>
+        @if (cfg.Key == SectionConfig.Grid)
+        {
+            <div class="field-row">
+                <div class="field"><label>Grid initial count</label><input class="input" type="number" @bind="cfg.GridInitialCount" /></div>
+                <div class="field"><label>Enabled categories (CSV, blank = all)</label><input class="input" @bind="cfg.EnabledCategoriesCsv" placeholder="Opera,Musicals,Plays" /></div>
+            </div>
+        }
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="() => SaveAsync(cfg)">Save</button>
+            @if (_savedKey == cfg.Key)
+            {
+                <span class="saved">Saved ✓</span>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<SectionConfig> _configs = [];
+    private string? _savedKey;
+
+    protected override async Task OnInitializedAsync() =>
+        _configs = (await Repo.GetAllAsync()).ToList();
+
+    private async Task SaveAsync(SectionConfig cfg)
+    {
+        await Repo.UpsertAsync(cfg);
+        _savedKey = cfg.Key;
+    }
+}

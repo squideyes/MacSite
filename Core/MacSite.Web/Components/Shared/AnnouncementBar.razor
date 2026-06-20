@@ -1,0 +1,15 @@
+@inject SiteContentService Content
+
+<div class="announce">
+    <div class="announce__inner">@((MarkupString)_text)</div>
+</div>
+
+@code {
+    private string _text = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await Content.GetSettingsAsync();
+        _text = settings.AnnouncementText;
+    }
+}

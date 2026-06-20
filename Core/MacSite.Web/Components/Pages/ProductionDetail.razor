@@ -1,0 +1,84 @@
+@page "/portfolio/{slug}"
+@inject IProductionRepository ProductionRepo
+@inject NavigationManager Nav
+
+@if (_production is null)
+{
+    @if (_loaded)
+    {
+        <section class="pd-banner"><div class="container"><h1 class="pd-banner__title">Not found</h1></div></section>
+        <section class="section" style="padding:80px 0;background:var(--c-parchment)">
+            <div class="container"><p>That production could not be found. <a href="/portfolio">Back to portfolio</a>.</p></div>
+        </section>
+    }
+}
+else
+{
+    <PageTitle>@_production.Title — Marie Anne Chiment</PageTitle>
+
+    <section class="pd-banner">
+        <div class="container">
+            <p class="pd-banner__crumb"><a href="/portfolio">Portfolio</a> &nbsp;/&nbsp; @_production.Category.ToDisplay()</p>
+            <h1 class="pd-banner__title">@_production.Title</h1>
+            <p class="pd-banner__meta">@_production.Venue &middot; @_production.Year</p>
+        </div>
+    </section>
+
+    <section class="pd section">
+        <div class="container pd__layout">
+            <div class="pd__media">
+                <img src="@(_production.PrimaryImageUrl ?? "/media/portfolio/slider-01.jpg")" alt="@_production.Title" />
+                @if (!string.IsNullOrWhiteSpace(_production.CaptionScene))
+                {
+                    <p class="pd__scene">@_production.CaptionScene</p>
+                }
+            </div>
+
+            <aside class="pd__credits">
+                <h2 class="pd__credits-title">Production Credits</h2>
+                <dl>
+                    @foreach (var (label, value) in Credits)
+                    {
+                        <div class="pd__credit">
+                            <dt>@label</dt>
+                            <dd>@value</dd>
+                        </div>
+                    }
+                </dl>
+                <a class="btn btn--solid pd__back" href="/portfolio">Back to Portfolio</a>
+            </aside>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private Production? _production;
+    private bool _loaded;
+
+    private IEnumerable<(string Label, string Value)> Credits
+    {
+        get
+        {
+            if (_production is null) yield break;
+            yield return ("Venue", _production.Venue);
+            yield return ("Year", _production.Year.ToString());
+            if (Has(_production.Director)) yield return ("Director", _production.Director!);
+            if (Has(_production.ComposerOrAuthor)) yield return ("Composer / Author", _production.ComposerOrAuthor!);
+            if (Has(_production.MusicDirector)) yield return ("Music Director", _production.MusicDirector!);
+            if (Has(_production.Lights)) yield return ("Lighting", _production.Lights!);
+            if (Has(_production.Scenery)) yield return ("Scenery", _production.Scenery!);
+            if (Has(_production.Choreography)) yield return ("Choreography", _production.Choreography!);
+            if (Has(_production.Photographer)) yield return ("Photography", _production.Photographer!);
+        }
+    }
+
+    private static bool Has(string? s) => !string.IsNullOrWhiteSpace(s) && s != "N/A";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _production = await ProductionRepo.GetBySlugAsync(Slug);
+        _loaded = true;
+    }
+}

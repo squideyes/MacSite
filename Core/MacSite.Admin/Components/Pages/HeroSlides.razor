@@ -1,0 +1,86 @@
+@page "/hero"
+@attribute [Authorize]
+@inject IHeroSlideRepository Repo
+
+<PageTitle>Hero Slides — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Hero Slides</h1>
+        <p class="studio__subtitle">Full-screen images in the homepage hero carousel.</p>
+    </div>
+    <button class="btn btn--primary" @onclick="() => Edit(new HeroSlide { SortOrder = _items.Count })">+ Add Slide</button>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="panel">
+        <div class="panel__title">@(_isNew ? "New slide" : "Edit slide")</div>
+        <div class="field"><label>Image</label><ImageUploader @bind-Value="_editing.ImageUrl" /></div>
+        <div class="field-row">
+            <div class="field"><label>Alt text</label><input class="input" @bind="_editing.Alt" /></div>
+            <div class="field"><label>Headline override (optional, allows &lt;br&gt;)</label><input class="input" @bind="_editing.Headline" /></div>
+        </div>
+        <label class="checkbox"><input type="checkbox" @bind="_editing.IsActive" /> Active</label>
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
+            <button class="btn btn--ghost" @onclick="() => _editing = null">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="rows">
+    @foreach (var (s, i) in _items.Select((s, i) => (s, i)))
+    {
+        <div class="row">
+            <div class="row__order">
+                <button disabled="@(i == 0)" @onclick="() => MoveAsync(i, -1)">▲</button>
+                <button disabled="@(i == _items.Count - 1)" @onclick="() => MoveAsync(i, 1)">▼</button>
+            </div>
+            <img class="row__thumb" src="@s.ImageUrl" alt="" />
+            <div class="row__body">
+                <div class="row__title">@(string.IsNullOrWhiteSpace(s.Alt) ? "(slide)" : s.Alt)</div>
+                <div class="row__meta">@s.ImageUrl</div>
+            </div>
+            <div class="row__actions">
+                <span class="badge @(s.IsActive ? "badge--on" : "badge--off")">@(s.IsActive ? "Active" : "Hidden")</span>
+                <button class="btn btn--ghost btn--sm" @onclick="() => Edit(s)">Edit</button>
+                <button class="btn btn--danger btn--sm" @onclick="() => DeleteAsync(s)">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<HeroSlide> _items = [];
+    private HeroSlide? _editing;
+    private bool _isNew;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
+
+    private void Edit(HeroSlide s)
+    {
+        _isNew = !_items.Contains(s);
+        _editing = _isNew ? s : new HeroSlide { Id = s.Id, ImageUrl = s.ImageUrl, Alt = s.Alt, Headline = s.Headline, ProductionId = s.ProductionId, SortOrder = s.SortOrder, IsActive = s.IsActive };
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editing is null) return;
+        await Repo.UpsertAsync(_editing);
+        _editing = null;
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(HeroSlide s) { await Repo.DeleteAsync(s.Id); await LoadAsync(); }
+
+    private async Task MoveAsync(int index, int delta)
+    {
+        var target = index + delta;
+        if (target < 0 || target >= _items.Count) return;
+        (_items[index], _items[target]) = (_items[target], _items[index]);
+        await Repo.ReorderAsync(_items.Select(x => x.Id).ToList());
+        await LoadAsync();
+    }
+}

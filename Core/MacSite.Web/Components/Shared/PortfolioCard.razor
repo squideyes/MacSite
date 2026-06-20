@@ -1,0 +1,23 @@
+<a class="pcard" href="/portfolio/@Production.Slug">
+    <div class="pcard__media">
+        <img class="pcard__img" src="@ImageUrl" alt="@Production.Title — @Production.Venue" loading="lazy" />
+        <div class="pcard__cap">
+            <span class="pcard__title">@Production.CaptionTitle</span>
+            @foreach (var line in SceneLines)
+            {
+                <span class="pcard__scene">@line</span>
+            }
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public Production Production { get; set; } = default!;
+
+    private string ImageUrl => Production.PrimaryImageUrl ?? "/media/portfolio/slider-01.jpg";
+
+    private IEnumerable<string> SceneLines =>
+        string.IsNullOrWhiteSpace(Production.CaptionScene)
+            ? []
+            : Production.CaptionScene.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+}

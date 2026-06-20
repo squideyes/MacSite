@@ -1,0 +1,35 @@
+<section class="bio section">
+    <div class="bio__watermark" aria-hidden="true"></div>
+
+    <div class="container">
+        <header class="bio__head">
+            <p class="eyebrow">@($"{BrandName} Biography")</p>
+            <h2 class="section-heading">A Life in Design</h2>
+        </header>
+
+        <div class="bio__photos">
+            <figure class="bio__photo bio__photo--scene taped">
+                <img src="@SceneImageUrl" alt="Marie Anne Chiment production" loading="lazy" />
+            </figure>
+            <figure class="bio__photo bio__photo--portrait taped">
+                <img src="@PortraitUrl" alt="Marie Anne Chiment portrait" loading="lazy" />
+            </figure>
+        </div>
+
+        <div class="bio__body">
+            <p>@Body</p>
+            @if (!string.IsNullOrWhiteSpace(CvUrl))
+            {
+                <a class="btn btn--solid bio__cv" href="@CvUrl" download>Download Marie's CV</a>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public string BrandName { get; set; } = "Marie Anne Chiment";
+    [Parameter] public string Body { get; set; } = string.Empty;
+    [Parameter] public string? PortraitUrl { get; set; } = "/media/bio/portrait.jpg";
+    [Parameter] public string? CvUrl { get; set; }
+    [Parameter] public string SceneImageUrl { get; set; } = "/media/portfolio/slider-04.jpg";
+}

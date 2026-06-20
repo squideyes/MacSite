@@ -1,0 +1,97 @@
+@page "/press"
+@attribute [Authorize]
+@inject IPressRepository Repo
+
+<PageTitle>Press — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Press</h1>
+        <p class="studio__subtitle">Clippings under "Featured in the Spotlight".</p>
+    </div>
+    <button class="btn btn--primary" @onclick="() => Edit(new PressItem { SortOrder = _items.Count, IsActive = true })">+ Add Press Item</button>
+</div>
+
+@if (_editing is not null)
+{
+    <div class="panel">
+        <div class="panel__title">@(_isNew ? "New press item" : "Edit press item")</div>
+        <div class="field-row">
+            <div class="field">
+                <label>Category</label>
+                <select class="select" @bind="_editing.Category">
+                    @foreach (var c in Enum.GetValues<PressCategory>())
+                    {
+                        <option value="@c">@c.ToDisplay()</option>
+                    }
+                </select>
+            </div>
+            <div class="field"><label>Image</label><ImageUploader @bind-Value="_editing.ImageUrl" /></div>
+        </div>
+        <div class="field"><label>Description</label><textarea class="textarea" @bind="_editing.Description"></textarea></div>
+        <div class="field"><label>Link URL (optional)</label><input class="input" @bind="_editing.Url" /></div>
+        <label class="checkbox"><input type="checkbox" @bind="_editing.IsActive" /> Active</label>
+        <div class="form-actions">
+            <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
+            <button class="btn btn--ghost" @onclick="() => _editing = null">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="rows">
+    @foreach (var (p, i) in _items.Select((p, i) => (p, i)))
+    {
+        <div class="row">
+            <div class="row__order">
+                <button disabled="@(i == 0)" @onclick="() => MoveAsync(i, -1)">▲</button>
+                <button disabled="@(i == _items.Count - 1)" @onclick="() => MoveAsync(i, 1)">▼</button>
+            </div>
+            <img class="row__thumb" src="@p.ImageUrl" alt="" />
+            <div class="row__body">
+                <div class="row__title">@p.Category.ToDisplay()</div>
+                <div class="row__meta">@Truncate(p.Description, 90)</div>
+            </div>
+            <div class="row__actions">
+                <span class="badge @(p.IsActive ? "badge--on" : "badge--off")">@(p.IsActive ? "Active" : "Hidden")</span>
+                <button class="btn btn--ghost btn--sm" @onclick="() => Edit(p)">Edit</button>
+                <button class="btn btn--danger btn--sm" @onclick="() => DeleteAsync(p)">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<PressItem> _items = [];
+    private PressItem? _editing;
+    private bool _isNew;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
+
+    private void Edit(PressItem p)
+    {
+        _isNew = !_items.Contains(p);
+        _editing = _isNew ? p : new PressItem { Id = p.Id, Category = p.Category, ImageUrl = p.ImageUrl, Title = p.Title, Description = p.Description, Url = p.Url, SortOrder = p.SortOrder, IsActive = p.IsActive };
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editing is null) return;
+        await Repo.UpsertAsync(_editing);
+        _editing = null;
+        await LoadAsync();
+    }
+
+    private async Task DeleteAsync(PressItem p) { await Repo.DeleteAsync(p.Id); await LoadAsync(); }
+
+    private async Task MoveAsync(int index, int delta)
+    {
+        var target = index + delta;
+        if (target < 0 || target >= _items.Count) return;
+        (_items[index], _items[target]) = (_items[target], _items[index]);
+        await Repo.ReorderAsync(_items.Select(x => x.Id).ToList());
+        await LoadAsync();
+    }
+
+    private static string Truncate(string s, int n) => s.Length <= n ? s : s[..n] + "…";
+}

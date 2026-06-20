@@ -1,0 +1,32 @@
+.ovl__img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9998;
+    pointer-events: none;
+    mix-blend-mode: normal;
+}
+
+.ovl-ctl {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #14110f;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    font: 12px/1 'Inter', system-ui, sans-serif;
+}
+.ovl-ctl__chk { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.ovl-ctl button {
+    background: #2c2722; color: #fff; border: 0; border-radius: 6px;
+    padding: 5px 9px; cursor: pointer; font: inherit;
+}
+.ovl-ctl button:hover { background: #443c34; }
+.ovl-ctl input[type=range] { width: 90px; }

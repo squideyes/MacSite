@@ -1,0 +1,25 @@
+<section class="spot section">
+    <div class="container">
+        <header class="spot__head">
+            <p class="eyebrow">Publications &amp; Press</p>
+            <h2 class="section-heading">Featured in the Spotlight</h2>
+        </header>
+
+        <div class="spot__grid">
+            @foreach (var item in Items)
+            {
+                <article class="spot__card">
+                    <a class="spot__media" href="@(item.Url ?? "#")" target="_blank" rel="noopener">
+                        <img src="@item.ImageUrl" alt="@(item.Title ?? item.Category.ToDisplay())" loading="lazy" />
+                    </a>
+                    <span class="spot__label">@item.Category.ToDisplay()</span>
+                    <p class="spot__desc">@item.Description</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public IReadOnlyList<PressItem> Items { get; set; } = [];
+}

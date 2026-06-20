@@ -1,0 +1,41 @@
+@page "/messages"
+@attribute [Authorize]
+@inject IContactMessageRepository Repo
+
+<PageTitle>Messages — MacSite Studio</PageTitle>
+
+<div class="studio__header">
+    <div>
+        <h1 class="studio__title">Messages</h1>
+        <p class="studio__subtitle">Submissions from the Contacts form.</p>
+    </div>
+</div>
+
+<div class="rows">
+    @if (_items.Count == 0)
+    {
+        <div class="panel">No messages yet.</div>
+    }
+    @foreach (var m in _items)
+    {
+        <div class="row">
+            <div class="row__body">
+                <div class="row__title">@m.Name <span class="hint">&lt;@m.Email&gt;</span> @if (!m.IsRead) { <span class="badge badge--on">New</span> }</div>
+                @if (!string.IsNullOrWhiteSpace(m.Subject)) { <div class="row__meta"><strong>@m.Subject</strong></div> }
+                <div class="row__meta">@m.Message</div>
+                <div class="row__meta">@m.CreatedAt.LocalDateTime.ToString("g")</div>
+            </div>
+            <div class="row__actions">
+                <a class="btn btn--ghost btn--sm" href="mailto:@m.Email">Reply</a>
+                @if (!m.IsRead) { <button class="btn btn--ghost btn--sm" @onclick="() => MarkReadAsync(m)">Mark read</button> }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ContactMessage> _items = [];
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+    private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
+    private async Task MarkReadAsync(ContactMessage m) { await Repo.MarkReadAsync(m.Id); await LoadAsync(); }
+}

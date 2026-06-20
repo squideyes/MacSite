@@ -1,0 +1,19 @@
+<section class="pbanner">
+    <div class="container">
+        @if (!string.IsNullOrWhiteSpace(Eyebrow))
+        {
+            <p class="pbanner__eyebrow">@Eyebrow</p>
+        }
+        <h1 class="pbanner__title">@Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Subtitle))
+        {
+            <p class="pbanner__sub">@Subtitle</p>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Eyebrow { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+}
