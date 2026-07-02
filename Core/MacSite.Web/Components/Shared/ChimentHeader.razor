@@ -1,0 +1,46 @@
+<div class="header-wrapper">
+    <div class="top-bar">
+        <div class="container">
+            AWARD-WINNING <a href="#">SET DESIGNS</a> AND <a href="#">COSTUME DESIGNS</a> THAT BRING STORIES TO
+            LIFE.
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-container">
+            <a href="/" class="logo">
+                <img src="assets/images/logo.svg" alt="Marie Anne Chiment">
+            </a>
+            <nav class="main-nav">
+                <button class="close-menu show-on-mobile">&times;</button>
+                <ul>
+                    <li><a href="@HomeHref" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
+                    <li><a href="@PortfolioHref" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
+                    <li><a href="@SectionHref("applause")">APPLAUSE</a></li>
+                    <li><a href="@SectionHref("bio")">BIO</a></li>
+                    <li><a href="@SectionHref("downloads")">DOWNLOADS</a></li>
+                    <li><a href="@SectionHref("contacts")">CONTACTS</a></li>
+                    <li class="show-on-mobile">
+                        <a href="@SectionHref("contacts")" class="btn btn-secondary">CONTACT MARIE</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="@SectionHref("contacts")" class="btn btn-secondary">CONTACT MARIE</a>
+
+                <button class="menu-icon show-on-mobile">
+                    <img src="assets/images/menu-icon.svg" alt="">
+                </button>
+            </div>
+        </div>
+        <div class="menu-overlay"></div>
+    </header>
+</div>
+
+@code {
+    [Parameter] public string ActiveNav { get; set; } = "home";
+
+    private string HomeHref => ActiveNav == "home" ? "#home" : "/#home";
+    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio#portfolio";
+
+    private string SectionHref(string id) => $"#{id}";
+}

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'MatitaInformalRegular';
+    src: url('fonts/MatitaInformalRegular.eot');
+    src: url('fonts/MatitaInformalRegular.eot') format('embedded-opentype'),
+         url('fonts/MatitaInformalRegular.woff2') format('woff2'),
+         url('fonts/MatitaInformalRegular.woff') format('woff'),
+         url('fonts/MatitaInformalRegular.ttf') format('truetype'),
+         url('fonts/MatitaInformalRegular.svg#MatitaInformalRegular') format('svg');
+}

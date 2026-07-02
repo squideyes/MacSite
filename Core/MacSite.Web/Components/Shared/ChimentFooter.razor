@@ -1,0 +1,59 @@
+<footer id="contacts">
+    <span class="separator">
+        <img src="assets/images/footer-separator.svg" alt="">
+    </span>
+    <div class="container">
+        <div class="footer-actions">
+            <div class="logo">
+                <img src="assets/images/footer-logo.svg" alt="">
+            </div>
+
+            <ul class="contact-list">
+                <li>
+                    <span class="icon">
+                        <img src="assets/images/call-icon-footer.svg" alt="">
+                    </span>
+                    CALL US +1 (215) 279-8868
+                </li>
+                <li>
+                    <span class="icon">
+                        <img src="assets/images/email-icon-footer.svg" alt="">
+                    </span>
+                    EMAIL: marie@chiment.com
+                </li>
+            </ul>
+
+            <div class="social">
+                <h6>FOLLOW US ON SOCIAL</h6>
+                <div class="social-list">
+                    <a href="#">
+                        <img src="assets/images/facebook.svg" alt="">
+                    </a>
+                    <a href="#">
+                        <img src="assets/images/instagram.svg" alt="">
+                    </a>
+                    <a href="#">
+                        <img src="assets/images/youtube.svg" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <ul class="footer-nav">
+            <li><a href="@HomeHref" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
+            <li><a href="@PortfolioHref" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
+            <li><a href="#applause">APPLAUSE</a></li>
+            <li><a href="#bio">BIO</a></li>
+            <li><a href="#downloads">DOWNLOADS</a></li>
+            <li><a href="#contacts">CONTACTS</a></li>
+        </ul>
+        <p class="copyright">&copy;2025 <span>MARIE AANE CHIMENT</span>, all rights reserved.</p>
+    </div>
+    <span class="bottom-bg"></span>
+</footer>
+
+@code {
+    [Parameter] public string ActiveNav { get; set; } = "home";
+
+    private string HomeHref => ActiveNav == "home" ? "#home" : "/#home";
+    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio#portfolio";
+}
