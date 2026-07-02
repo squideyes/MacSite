@@ -1,0 +1,51 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@implements IDisposable
+
+<HeadContent>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/styles/custom.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="css/chiment-integration.css" />
+</HeadContent>
+
+<main class="@_mainClass">
+    <ChimentHeader ActiveNav="@_activeNav" />
+    @Body
+    <ChimentFooter ActiveNav="@_activeNav" />
+</main>
+
+<DesignOverlay />
+
+@* Scripts load after page content; chiment.js hooks Blazor enhancedload when blazor.web.js is ready *@
+
+@code {
+    private ChimentPageKind _pageKind = ChimentPageKind.Home;
+
+    private string _mainClass => _pageKind == ChimentPageKind.Portfolio ? "portfolio-page" : string.Empty;
+    private string _activeNav => _pageKind == ChimentPageKind.Portfolio ? "portfolio" : "home";
+
+    protected override void OnInitialized()
+    {
+        UpdatePageKind(Nav.Uri);
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdatePageKind(e.Location);
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdatePageKind(string uri)
+    {
+        var path = new Uri(uri).AbsolutePath.TrimEnd('/');
+        _pageKind = path.Equals("/portfolio", StringComparison.OrdinalIgnoreCase)
+            ? ChimentPageKind.Portfolio
+            : ChimentPageKind.Home;
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}

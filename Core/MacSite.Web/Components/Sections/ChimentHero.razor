@@ -1,0 +1,56 @@
+<div class="home-banner" id="home">
+    <div class="slider">
+        <div class="slide">
+            <div class="image">
+                <img src="assets/images/banner/banner-img1.png" alt="Banner">
+                <div class="caption">
+                    <h1>@((MarkupString)Headline)</h1>
+                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <div class="image">
+                <img src="assets/images/banner/banner-img2.jpg" alt="Banner">
+                <div class="caption">
+                    <h1>@((MarkupString)Headline)</h1>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <div class="image">
+                <img src="assets/images/banner/banne-img3.JPG" alt="Banner">
+                <div class="caption">
+                    <h1>@((MarkupString)Headline)</h1>
+                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+            <div class="image">
+                <img src="assets/images/banner/banner-img-4.jpg" alt="Banner">
+                <div class="caption">
+                    <h1>@((MarkupString)Headline)</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="separator">
+        <img src="assets/images/separator.svg" alt="">
+    </div>
+    <div class="container">
+        <div class="play-icon">
+            <div class="inner">
+                <img src="assets/images/play-icon-image.png" class="inner-image">
+            </div>
+            <img src="assets/images/play.svg" class="icon" alt="">
+            <span class="text">
+                <ChimentWatchTextSvg />
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Headline { get; set; } = "TRANSFORMING STORYTELLING THROUGH SET &amp; COSTUME DESIGN";
+}

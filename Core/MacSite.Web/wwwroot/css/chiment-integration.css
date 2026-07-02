@@ -1,0 +1,21 @@
+/* Neutralize MacSite global styles on Chiment (source) pages */
+body {
+    font-family: var(--font-regular);
+    color: #131313;
+    font-size: 16px;
+    background: #FDFBF2;
+    line-height: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+
+/* Restore source .container without flattening .header-container vertical padding */
+.container:not(.header-container) {
+    max-width: 1496px;
+    padding: 0 15px;
+    margin: 0 auto;
+}

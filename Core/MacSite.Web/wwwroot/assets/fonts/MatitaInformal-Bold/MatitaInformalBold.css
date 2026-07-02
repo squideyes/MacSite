@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'MatitaInformalBold';
+    src: url('fonts/MatitaInformalBold.eot');
+    src: url('fonts/MatitaInformalBold.eot') format('embedded-opentype'),
+         url('fonts/MatitaInformalBold.woff2') format('woff2'),
+         url('fonts/MatitaInformalBold.woff') format('woff'),
+         url('fonts/MatitaInformalBold.ttf') format('truetype'),
+         url('fonts/MatitaInformalBold.svg#MatitaInformalBold') format('svg');
+}
