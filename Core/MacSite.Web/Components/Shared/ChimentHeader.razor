@@ -7,14 +7,14 @@
     </div>
     <header class="main-header">
         <div class="container header-container">
-            <a href="/" class="logo">
+            <a href="@LogoHref" @attributes="LogoLinkAttrs" class="logo">
                 <img src="assets/images/logo.svg" alt="Marie Anne Chiment">
             </a>
             <nav class="main-nav">
                 <button class="close-menu show-on-mobile">&times;</button>
                 <ul>
-                    <li><a href="@HomeHref" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
-                    <li><a href="@PortfolioHref" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
+                    <li><a href="@HomeHref" @attributes="HomeLinkAttrs" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
+                    <li><a href="@PortfolioHref" @attributes="PortfolioLinkAttrs" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
                     <li><a href="@SectionHref("applause")">APPLAUSE</a></li>
                     <li><a href="@SectionHref("bio")">BIO</a></li>
                     <li><a href="@SectionHref("downloads")">DOWNLOADS</a></li>
@@ -39,8 +39,18 @@
 @code {
     [Parameter] public string ActiveNav { get; set; } = "home";
 
-    private string HomeHref => ActiveNav == "home" ? "#home" : "/#home";
-    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio#portfolio";
+    private string LogoHref => ActiveNav == "home" ? "/" : "/";
+    private IReadOnlyDictionary<string, object>? LogoLinkAttrs =>
+        ActiveNav == "home" ? null : new Dictionary<string, object> { ["data-enhance-nav"] = "false" };
+
+    private string HomeHref => ActiveNav == "home" ? "#home" : "/";
+    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio";
+
+    private IReadOnlyDictionary<string, object>? HomeLinkAttrs =>
+        ActiveNav == "home" ? null : new Dictionary<string, object> { ["data-enhance-nav"] = "false" };
+
+    private IReadOnlyDictionary<string, object>? PortfolioLinkAttrs =>
+        ActiveNav == "portfolio" ? null : new Dictionary<string, object> { ["data-enhance-nav"] = "false" };
 
     private string SectionHref(string id) => $"#{id}";
 }

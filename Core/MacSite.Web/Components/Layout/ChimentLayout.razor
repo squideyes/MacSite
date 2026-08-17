@@ -11,13 +11,18 @@
     <link rel="stylesheet" href="css/chiment-integration.css" />
 </HeadContent>
 
-<main class="@_mainClass">
-    <ChimentHeader ActiveNav="@_activeNav" />
-    @Body
-    <ChimentFooter ActiveNav="@_activeNav" />
-</main>
+<div class="chiment-canvas">
+    <main class="@_mainClass">
+        <ChimentHeader ActiveNav="@_activeNav" />
+        @* Force a full remount when switching Home ↔ Portfolio so Slick carousels are not reused in a broken state *@
+        <div class="chiment-page" @key="_pageKind">
+            @Body
+        </div>
+        <ChimentFooter ActiveNav="@_activeNav" />
+    </main>
 
-<DesignOverlay />
+    <DesignOverlay />
+</div>
 
 @* Scripts load after page content; chiment.js hooks Blazor enhancedload when blazor.web.js is ready *@
 
