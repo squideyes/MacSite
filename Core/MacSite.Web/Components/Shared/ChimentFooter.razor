@@ -39,8 +39,8 @@
             </div>
         </div>
         <ul class="footer-nav">
-            <li><a href="@HomeHref" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
-            <li><a href="@PortfolioHref" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
+            <li><a href="@HomeHref" @attributes="HomeLinkAttrs" class="@(ActiveNav == "home" ? "active" : null)">HOME</a></li>
+            <li><a href="@PortfolioHref" @attributes="PortfolioLinkAttrs" class="@(ActiveNav == "portfolio" ? "active" : null)">PORTFOLIO</a></li>
             <li><a href="#applause">APPLAUSE</a></li>
             <li><a href="#bio">BIO</a></li>
             <li><a href="#downloads">DOWNLOADS</a></li>
@@ -54,6 +54,12 @@
 @code {
     [Parameter] public string ActiveNav { get; set; } = "home";
 
-    private string HomeHref => ActiveNav == "home" ? "#home" : "/#home";
-    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio#portfolio";
+    private string HomeHref => ActiveNav == "home" ? "#home" : "/";
+    private string PortfolioHref => ActiveNav == "portfolio" ? "#portfolio" : "/portfolio";
+
+    private IReadOnlyDictionary<string, object>? HomeLinkAttrs =>
+        ActiveNav == "home" ? null : new Dictionary<string, object> { ["data-enhance-nav"] = "false" };
+
+    private IReadOnlyDictionary<string, object>? PortfolioLinkAttrs =>
+        ActiveNav == "portfolio" ? null : new Dictionary<string, object> { ["data-enhance-nav"] = "false" };
 }

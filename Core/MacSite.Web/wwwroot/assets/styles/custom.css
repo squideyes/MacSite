@@ -1174,18 +1174,11 @@ footer .bottom-bg {
   background-size: cover;
 }
 
-/* DEVIATION FROM UMAIR'S CSS (intentional): this zoom:0.8 rule scales the whole
-   page to 80% below 1800px viewport, which fights the fixed 1920px design-overlay
-   comp and makes the pixel-fidelity overlay double/misalign. Commented out so the
-   live layout stays full-width and lines up with the 1920px overlay at any window
-   size. Restore this block if faithful reproduction of Umair's responsive scaling
-   is required in production.
 @media screen and (max-width: 1800px) {
   html {
     zoom: 0.8;
   }
 }
-*/
 @media screen and (max-width: 1200px) {
   .container {
     padding-left: 35px;

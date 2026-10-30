@@ -13,6 +13,14 @@ h1, h2, h3, h4, h5, h6 {
     line-height: inherit;
 }
 
+/* Match the 1920px design comp canvas (same role as .page in MainLayout) */
+.chiment-canvas {
+    width: 100%;
+    max-width: 1920px;
+    margin-inline: auto;
+    position: relative;
+}
+
 /* Restore source .container without flattening .header-container vertical padding */
 .container:not(.header-container) {
     max-width: 1496px;

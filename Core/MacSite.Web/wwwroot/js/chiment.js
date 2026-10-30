@@ -1,12 +1,36 @@
 (function () {
-    function destroySlick($el) {
-        if ($el.length && $el.hasClass('slick-initialized')) {
-            $el.slick('unslick');
+    function resetSlick($el) {
+        if (!$el || !$el.length) return;
+
+        try {
+            if ($el.hasClass('slick-initialized')) {
+                $el.slick('unslick');
+            }
+        } catch (err) {
+            console.warn('chiment: slick unslick skipped', err);
         }
+
+        $el.removeClass('slick-initialized slick-slider');
+        $el.find('.slide').css({
+            display: '',
+            opacity: '',
+            position: '',
+            width: '',
+            left: '',
+            top: '',
+            zIndex: ''
+        });
+    }
+
+    function destroyAllSlicks() {
+        if (typeof jQuery === 'undefined' || typeof $.fn.slick === 'undefined') return;
+        $('.slick-initialized').each(function () {
+            resetSlick($(this));
+        });
     }
 
     function initSliders() {
-        destroySlick($('.testimonials-slider'));
+        resetSlick($('.testimonials-slider'));
         if ($('.testimonials-slider').length) {
             $('.testimonials-slider').slick({
                 infinite: true,
@@ -26,7 +50,7 @@
             });
         }
 
-        destroySlick($('.portfolio-slider'));
+        resetSlick($('.portfolio-slider'));
         if ($('.portfolio-slider').length) {
             $('.portfolio-slider').slick({
                 infinite: true,
@@ -43,7 +67,7 @@
             });
         }
 
-        destroySlick($('.home-banner .slider'));
+        resetSlick($('.home-banner .slider'));
         if ($('.home-banner .slider').length) {
             $('.home-banner .slider').slick({
                 infinite: true,
@@ -71,8 +95,8 @@
                     arrows: false
                 });
             }
-        } else if ($('.press-slider').hasClass('slick-initialized')) {
-            $('.press-slider').slick('unslick');
+        } else {
+            resetSlick($('.press-slider'));
         }
     }
 
@@ -115,7 +139,6 @@
     function bindPortfolioTabs() {
         if ($('.tabs').length === 0) return;
 
-        // Delegated handler survives Blazor enhanced-navigation DOM patches.
         $(document).off('click.chiment', '.tabs a').on('click.chiment', '.tabs a', function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -130,7 +153,7 @@
     }
 
     function bindSmoothScroll() {
-        $('a[href*="#"]:not(.tabs a)').off('click.chiment').on('click.chiment', function (e) {
+        $(document).off('click.chiment', 'a[href*="#"]:not(.tabs a)').on('click.chiment', 'a[href*="#"]:not(.tabs a)', function (e) {
             var href = $(this).attr('href');
             if (!href || href === '#') return;
 
@@ -141,7 +164,6 @@
             var targetId = href.substring(hashIndex);
             if (targetId.length <= 1) return;
 
-            // Let Blazor navigate when the link targets another page.
             if (path && path !== window.location.pathname) return;
 
             var $target = $(targetId);
@@ -178,20 +200,33 @@
         bindSmoothScroll();
     };
 
-    function hookBlazorEnhancedLoad() {
+    function scheduleChimentInit() {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                window.chimentInit();
+            });
+        });
+    }
+
+    function hookBlazorNavigation() {
         if (window.__chimentEnhancedHooked) return true;
         if (typeof Blazor === 'undefined' || typeof Blazor.addEventListener !== 'function') return false;
 
-        Blazor.addEventListener('enhancedload', function () {
-            window.chimentInit();
+        Blazor.addEventListener('enhancednavigationstart', function () {
+            destroyAllSlicks();
         });
+
+        Blazor.addEventListener('enhancedload', function () {
+            scheduleChimentInit();
+        });
+
         window.__chimentEnhancedHooked = true;
         return true;
     }
 
     function boot() {
         window.chimentInit();
-        hookBlazorEnhancedLoad();
+        hookBlazorNavigation();
     }
 
     if (document.readyState === 'loading') {
@@ -200,11 +235,10 @@
         boot();
     }
 
-    // Layout scripts can load before blazor.web.js — poll until Blazor is ready.
-    if (!hookBlazorEnhancedLoad()) {
+    if (!hookBlazorNavigation()) {
         var attempts = 0;
         var timer = setInterval(function () {
-            if (hookBlazorEnhancedLoad() || ++attempts > 100) {
+            if (hookBlazorNavigation() || ++attempts > 100) {
                 clearInterval(timer);
             }
         }, 50);
