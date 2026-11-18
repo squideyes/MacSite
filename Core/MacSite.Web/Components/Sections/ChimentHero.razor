@@ -1,56 +1,83 @@
+@implements IDisposable
+@inject IHeroSlideRepository Slides
+@inject SiteContentService Content
+
 <div class="home-banner" id="home">
-    <div class="slider">
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img1.png" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+    <div class="slider" data-slick="@SiteContentService.SlickOptions(_config)">
+        @foreach (var slide in _slides)
+        {
+            <div class="slide">
+                <div class="image">
+                    <img src="@(MacSite.Core.Common.MediaUrl.Normalize(slide.ImageUrl) ?? FallbackImage)" alt="@slide.Alt">
+                    @if (_config.ShowCaptions)
+                    {
+                        <div class="caption">
+                            <h1>@ContentLinks.InlineText(string.IsNullOrWhiteSpace(slide.Headline) ? DefaultHeadline : slide.Headline)</h1>
+                            @if (ShowPortfolioLink)
+                            {
+                                <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img2.jpg" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                </div>
-            </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banne-img3.JPG" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                    <a href="/portfolio" class="btn btn-secondary">ENTER PORTFOLIO</a>
-                </div>
-            </div>
-        </div>
-        <div class="slide">
-            <div class="image">
-                <img src="assets/images/banner/banner-img-4.jpg" alt="Banner">
-                <div class="caption">
-                    <h1>@((MarkupString)Headline)</h1>
-                </div>
-            </div>
-        </div>
+        }
     </div>
     <div class="separator">
         <img src="assets/images/separator.svg" alt="">
     </div>
     <div class="container">
-        <div class="play-icon">
-            <div class="inner">
-                <img src="assets/images/play-icon-image.png" class="inner-image">
+        @if (ContentLinks.HeroVideoUrl(_settings.HeroVideoUrl) is { } videoUrl)
+        {
+            <a class="play-icon" href="@videoUrl" target="_blank" rel="noopener" aria-label="@_settings.HeroVideoBadgeText">
+                <div class="inner">
+                    <img src="assets/images/play-icon-image.png" class="inner-image" alt="">
+                </div>
+                <img src="assets/images/play.svg" class="icon" alt="">
+                <span class="text"><ChimentWatchTextSvg /></span>
+            </a>
+        }
+        else
+        {
+            <div class="play-icon" aria-hidden="true" style="pointer-events: none">
+                <div class="inner">
+                    <img src="assets/images/play-icon-image.png" class="inner-image" alt="">
+                </div>
+                <img src="assets/images/play.svg" class="icon" alt="">
+                <span class="text"><ChimentWatchTextSvg /></span>
             </div>
-            <img src="assets/images/play.svg" class="icon" alt="">
-            <span class="text">
-                <ChimentWatchTextSvg />
-            </span>
-        </div>
+        }
     </div>
 </div>
 
 @code {
-    [Parameter] public string Headline { get; set; } = "TRANSFORMING STORYTELLING THROUGH SET &amp; COSTUME DESIGN";
+    [Parameter] public bool ShowPortfolioLink { get; set; } = true;
+    private const string FallbackImage = "/media/hero/hero-1.jpg";
+    private readonly CancellationTokenSource _lifetime = new();
+    private IReadOnlyList<HeroSlide> _slides = [];
+    private SiteSettings _settings = new();
+    private SectionConfig _config = new() { Key = SectionConfig.Hero };
+    private string DefaultHeadline => string.IsNullOrWhiteSpace(_settings.DefaultHeroHeadline)
+        ? new SiteSettings().DefaultHeroHeadline : _settings.DefaultHeroHeadline;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var ct = _lifetime.Token;
+        try
+        {
+            _slides = await Slides.GetActiveAsync(ct);
+            _settings = await Content.GetSettingsAsync(ct);
+            _config = await Content.GetConfigAsync(SectionConfig.Hero, ct);
+            // Render a bundled fallback without inserting or reactivating any editorial content.
+            if (_slides.Count == 0)
+                _slides = [new HeroSlide { ImageUrl = FallbackImage, Alt = "The Magic Flute — costume design by Marie Anne Chiment" }];
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+    }
+
+    public void Dispose()
+    {
+        _lifetime.Cancel();
+        _lifetime.Dispose();
+    }
 }

@@ -67,20 +67,12 @@
             });
         }
 
-        resetSlick($('.home-banner .slider'));
-        if ($('.home-banner .slider').length) {
-            $('.home-banner .slider').slick({
-                infinite: true,
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                dots: true,
-                arrows: false,
-                autoplay: true,
-                autoplaySpeed: 3000,
-                speed: 600,
-                fade: true,
-                cssEase: 'linear'
-            });
+        const hero = $('.home-banner .slider');
+        if (hero.length) {
+            resetSlick(hero);
+            // Enhanced navigation can reuse the DOM node with new Studio options.
+            hero.removeData('slick');
+            hero.slick({ infinite: true, speed: 600, cssEase: 'linear' });
         }
     }
 

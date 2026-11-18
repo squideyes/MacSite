@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\MacSite.Core\MacSite.Core.csproj" />
+    <ProjectReference Include="..\..\Core\MacSite.Web\MacSite.Web.csproj" />
     <ProjectReference Include="..\..\Core\MacSite.Data\MacSite.Data.csproj" />
   </ItemGroup>
 

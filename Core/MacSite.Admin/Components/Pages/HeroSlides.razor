@@ -17,11 +17,13 @@
     <div class="panel">
         <div class="panel__title">@(_isNew ? "New slide" : "Edit slide")</div>
         <div class="field"><label>Image</label><ImageUploader @bind-Value="_editing.ImageUrl" /></div>
+        <div class="field"><label>Image URL or local path</label><input class="input" aria-label="Image URL or local path" @bind="_editing.ImageUrl" placeholder="/media/hero/hero-1.jpg" /></div>
         <div class="field-row">
             <div class="field"><label>Alt text</label><input class="input" @bind="_editing.Alt" /></div>
             <div class="field"><label>Headline override (optional, allows &lt;br&gt;)</label><input class="input" @bind="_editing.Headline" /></div>
         </div>
         <label class="checkbox"><input type="checkbox" @bind="_editing.IsActive" /> Active</label>
+        @if (_error is not null) { <p role="alert">@_error</p> }
         <div class="form-actions">
             <button class="btn btn--primary" @onclick="SaveAsync">Save</button>
             <button class="btn btn--ghost" @onclick="() => _editing = null">Cancel</button>
@@ -55,12 +57,14 @@
     private List<HeroSlide> _items = [];
     private HeroSlide? _editing;
     private bool _isNew;
+    private string? _error;
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
     private async Task LoadAsync() => _items = (await Repo.GetAllAsync()).ToList();
 
     private void Edit(HeroSlide s)
     {
+        _error = null;
         _isNew = !_items.Contains(s);
         _editing = _isNew ? s : new HeroSlide { Id = s.Id, ImageUrl = s.ImageUrl, Alt = s.Alt, Headline = s.Headline, ProductionId = s.ProductionId, SortOrder = s.SortOrder, IsActive = s.IsActive };
     }
@@ -68,6 +72,14 @@
     private async Task SaveAsync()
     {
         if (_editing is null) return;
+        var imageUrl = MacSite.Core.Common.MediaUrl.Normalize(_editing.ImageUrl);
+        if (imageUrl is null)
+        {
+            _error = "Choose an image or use an HTTP(S) URL or local image path, such as /media/hero/hero-1.jpg.";
+            return;
+        }
+        _editing.ImageUrl = imageUrl;
+        _error = null;
         await Repo.UpsertAsync(_editing);
         _editing = null;
         await LoadAsync();

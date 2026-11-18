@@ -185,7 +185,7 @@ public static class DataSeeder
             "Handbook, her recent credits include LES FETES DE THALIE at the Kennedy Center.";
         current.PortraitImageUrl = "/media/bio/portrait.jpg";
         current.CvFileUrl = "/media/downloads/marie-anne-chiment-cv.pdf";
-        current.HeroVideoUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        // New settings leave HeroVideoUrl null; preserve any URL already supplied in Studio.
         current.FacebookUrl = "https://facebook.com/";
         current.InstagramUrl = "https://instagram.com/";
         current.YoutubeUrl = "https://youtube.com/";

@@ -1,39 +1,69 @@
 @rendermode InteractiveServer
+@implements IDisposable
 @inject ISubscriberRepository Subscribers
 
-<div class="signup">
+<div class="@(Chiment ? "signup signup--chiment" : "signup")">
     @if (_done)
     {
-        <p class="signup__done">Thank you — you're on the list.</p>
+        <p class="signup__done" role="status">Thank you — you're on the list.</p>
     }
     else
     {
-        <EditForm Model="_model" OnValidSubmit="SubmitAsync" class="signup__form" FormName="newsletter">
+        <EditForm Model="_model" OnValidSubmit="SubmitAsync" class="@(Chiment ? "signup-form" : "signup__form")" FormName="newsletter">
             <DataAnnotationsValidator />
-            <div class="signup__field">
-                <span class="signup__icon"><img src="/icons/email.svg" alt="" width="18" height="14" /></span>
-                <InputText @bind-Value="_model.Email" type="email" class="signup__input" placeholder="Enter your email..." autocomplete="email" />
-                <button type="submit" class="signup__btn">Sign Up</button>
+            <div class="@(Chiment ? "signup-form__row" : "signup__field")">
+                <div class="@(Chiment ? "input" : "signup__email")">
+                    <span class="@(Chiment ? "icon" : "signup__icon")"><img src="/icons/email.svg" alt="" width="18" height="14" /></span>
+                    <InputText disabled="@(!RendererInfo.IsInteractive)" @bind-Value="_model.Email" type="email" class="@(Chiment ? "form-control" : "signup__input")" maxlength="254" aria-label="Email address" placeholder="Enter your email..." autocomplete="email" />
+                </div>
+                <button type="submit" disabled="@(_busy || !RendererInfo.IsInteractive)" class="@(Chiment ? "form-btn" : "signup__btn")">Sign Up</button>
             </div>
             <ValidationMessage For="() => _model.Email" />
+            @if (_error is not null) { <p role="alert">@_error</p> }
         </EditForm>
     }
 </div>
 
 @code {
+    [Parameter] public bool Chiment { get; set; }
     private readonly Model _model = new();
+    private readonly CancellationTokenSource _lifetime = new();
     private bool _done;
+    private bool _busy;
+    private string? _error;
 
     private async Task SubmitAsync()
     {
-        if (string.IsNullOrWhiteSpace(_model.Email)) return;
-        await Subscribers.AddAsync(_model.Email);
-        _done = true;
+        if (_busy || _done) return;
+        _busy = true;
+        _error = null;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_model.Email)) return;
+            await Subscribers.AddAsync(_model.Email, _lifetime.Token);
+            _done = true;
+        }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
+        catch (System.Data.Common.DbException)
+        {
+            _error = "We could not save your submission. Please try again.";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _lifetime.Cancel();
+        _lifetime.Dispose();
     }
 
     private sealed class Model
     {
         [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(254)]
         [System.ComponentModel.DataAnnotations.EmailAddress]
         public string Email { get; set; } = string.Empty;
     }
